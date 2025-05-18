@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Health{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Health Records</h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">Family health records and tracking.</p>
+    </div>
+    <div class="border-t border-gray-200">
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <div class="text-sm font-medium text-gray-500">Recent Health Records</div>
+            <div class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <ul role="list" class="divide-y divide-gray-200">
+                    <!-- Health records will be loaded dynamically via JavaScript -->
+                    <li class="py-4">Loading health records...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Fetch health records from the API
+    async function loadHealthRecords() {
+        try {
+            const response = await fetch('/api/v1/health');
+            const records = await response.json();
+            
+            const recordsList = document.querySelector('ul');
+            recordsList.innerHTML = records.map(record => `
+                <li class="py-4">
+                    <div class="flex space-x-3">
+                        <div class="flex-1 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-medium">${record.record_type}</h3>
+                                <p class="text-sm text-gray-500">${new Date(record.record_date).toLocaleDateString()}</p>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm text-gray-900">${record.value} ${record.unit || ''}</p>
+                            </div>
+                            ${record.notes ? `<p class="text-sm text-gray-500">${record.notes}</p>` : ''}
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+        } catch (error) {
+            console.error('Error loading health records:', error);
+        }
+    }
+
+    // Load health records when the page loads
+    document.addEventListener('DOMContentLoaded', loadHealthRecords);
+</script>
+{% endblock %} 

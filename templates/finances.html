@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Finances{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Finances</h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">Family financial transactions and budget.</p>
+    </div>
+    <div class="border-t border-gray-200">
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <div class="text-sm font-medium text-gray-500">Recent Transactions</div>
+            <div class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <ul role="list" class="divide-y divide-gray-200">
+                    <!-- Transactions will be loaded dynamically via JavaScript -->
+                    <li class="py-4">Loading transactions...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Format currency
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(amount);
+    }
+
+    // Fetch transactions from the API
+    async function loadTransactions() {
+        try {
+            const response = await fetch('/api/v1/finances');
+            const transactions = await response.json();
+            
+            const transactionsList = document.querySelector('ul');
+            transactionsList.innerHTML = transactions.map(transaction => `
+                <li class="py-4">
+                    <div class="flex space-x-3">
+                        <div class="flex-1 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-medium">${transaction.description}</h3>
+                                <p class="text-sm ${parseFloat(transaction.amount) >= 0 ? 'text-green-600' : 'text-red-600'}">
+                                    ${formatCurrency(transaction.amount)}
+                                </p>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm text-gray-500">${transaction.category}</p>
+                                <p class="text-sm text-gray-500">${new Date(transaction.transaction_date).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+        } catch (error) {
+            console.error('Error loading transactions:', error);
+        }
+    }
+
+    // Load transactions when the page loads
+    document.addEventListener('DOMContentLoaded', loadTransactions);
+</script>
+{% endblock %} 

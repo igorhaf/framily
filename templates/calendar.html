@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Calendar{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Calendar</h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">Family events and schedules.</p>
+    </div>
+    <div class="border-t border-gray-200">
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <div class="text-sm font-medium text-gray-500">Upcoming Events</div>
+            <div class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                <ul role="list" class="divide-y divide-gray-200">
+                    <!-- Events will be loaded dynamically via JavaScript -->
+                    <li class="py-4">Loading events...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Fetch events from the API
+    async function loadEvents() {
+        try {
+            const response = await fetch('/api/v1/calendar/events');
+            const events = await response.json();
+            
+            const eventsList = document.querySelector('ul');
+            eventsList.innerHTML = events.map(event => `
+                <li class="py-4">
+                    <div class="flex space-x-3">
+                        <div class="flex-1 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-medium">${event.title}</h3>
+                                <p class="text-sm text-gray-500">${new Date(event.start_time).toLocaleDateString()}</p>
+                            </div>
+                            <p class="text-sm text-gray-500">${event.description || 'No description'}</p>
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+        } catch (error) {
+            console.error('Error loading events:', error);
+        }
+    }
+
+    // Load events when the page loads
+    document.addEventListener('DOMContentLoaded', loadEvents);
+</script>
+{% endblock %} 
