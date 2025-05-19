@@ -1,0 +1,444 @@
+{
+  "info": {
+    "_postman_id": "c5c72e9d-4d6b-4a3c-a8c9-0f7f3b2e1d4f",
+    "name": "Family Dashboard API",
+    "description": "API para o sistema de gerenciamento familiar (Family Dashboard)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Tarefas",
+      "description": "Endpoints para gerenciamento de tarefas",
+      "item": [
+        {
+          "name": "Listar Tarefas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tasks/?skip=0&limit=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "tasks", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retorna a lista de tarefas"
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Tarefa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nova Tarefa\",\n  \"description\": \"Descrição da tarefa\",\n  \"due_date\": \"2025-05-30T12:00:00\",\n  \"priority\": \"medium\",\n  \"status\": \"pending\",\n  \"assigned_to\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tasks/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "tasks", ""]
+            },
+            "description": "Cria uma nova tarefa"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Finanças",
+      "description": "Endpoints para gerenciamento financeiro",
+      "item": [
+        {
+          "name": "Listar Categorias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finance/categories/?family_id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "finance", "categories", ""],
+              "query": [
+                {
+                  "key": "family_id",
+                  "value": "1"
+                },
+                {
+                  "key": "type",
+                  "value": "EXPENSE",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retorna a lista de categorias financeiras"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Transações",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finance/transactions/?family_id=1&skip=0&limit=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "finance", "transactions", ""],
+              "query": [
+                {
+                  "key": "family_id",
+                  "value": "1"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                },
+                {
+                  "key": "start_date",
+                  "value": "2025-01-01",
+                  "disabled": true
+                },
+                {
+                  "key": "end_date",
+                  "value": "2025-12-31",
+                  "disabled": true
+                },
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "EXPENSE",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retorna a lista de transações financeiras"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Orçamentos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finance/budgets/?family_id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "finance", "budgets", ""],
+              "query": [
+                {
+                  "key": "family_id",
+                  "value": "1"
+                },
+                {
+                  "key": "month",
+                  "value": "5",
+                  "disabled": true
+                },
+                {
+                  "key": "year",
+                  "value": "2025",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retorna a lista de orçamentos"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Saúde",
+      "description": "Endpoints para gerenciamento de saúde",
+      "item": [
+        {
+          "name": "Listar Consultas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/health/appointments/?skip=0&limit=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "health", "appointments", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                },
+                {
+                  "key": "family_member_id",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retorna a lista de consultas médicas"
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Consulta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Consulta Cardiologista\",\n  \"doctor_name\": \"Dr. João Silva\",\n  \"specialty\": \"Cardiologia\",\n  \"date\": \"2025-06-15T10:00:00\",\n  \"location\": \"Hospital Central\",\n  \"notes\": \"Levar exames anteriores\",\n  \"family_member_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/health/appointments/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "health", "appointments", ""]
+            },
+            "description": "Cria uma nova consulta médica"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Medicamentos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/health/medications/?skip=0&limit=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "health", "medications", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                },
+                {
+                  "key": "family_member_id",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retorna a lista de medicamentos"
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Medicamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Paracetamol\",\n  \"dosage\": \"500mg\",\n  \"frequency\": \"8 em 8 horas\",\n  \"start_date\": \"2025-05-20\",\n  \"end_date\": \"2025-05-25\",\n  \"notes\": \"Tomar após as refeições\",\n  \"family_member_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/health/medications/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "health", "medications", ""]
+            },
+            "description": "Adiciona um novo medicamento"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Exames",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/health/exams/?skip=0&limit=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "health", "exams", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                },
+                {
+                  "key": "family_member_id",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retorna a lista de exames médicos"
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Exame",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Hemograma Completo\",\n  \"date\": \"2025-06-10\",\n  \"location\": \"Laboratório Central\",\n  \"results\": \"Resultados normais\",\n  \"notes\": \"Jejum de 8 horas\",\n  \"family_member_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/health/exams/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "health", "exams", ""]
+            },
+            "description": "Adiciona um novo exame médico"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Calendário",
+      "description": "Endpoints para gerenciamento de eventos no calendário",
+      "item": [
+        {
+          "name": "Listar Eventos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calendar/events/?start_date=2025-05-01&end_date=2025-06-30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calendar", "events", ""],
+              "query": [
+                {
+                  "key": "start_date",
+                  "value": "2025-05-01",
+                  "description": "Data inicial (YYYY-MM-DD)"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2025-06-30",
+                  "description": "Data final (YYYY-MM-DD)"
+                },
+                {
+                  "key": "family_member_id",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "event_type",
+                  "value": "trabalho",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retorna a lista de eventos do calendário dentro de um período específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Evento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Reunião de Trabalho\",\n  \"description\": \"Reunião com a equipe de desenvolvimento\",\n  \"start_date\": \"2025-05-25T10:00:00\",\n  \"end_date\": \"2025-05-25T11:00:00\",\n  \"event_type\": \"trabalho\",\n  \"family_member_id\": 1,\n  \"location\": \"Escritório\",\n  \"is_all_day\": false,\n  \"color\": \"#4285F4\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calendar/events/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calendar", "events", ""]
+            },
+            "description": "Cria um novo evento no calendário"
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Evento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Reunião de Trabalho (Atualizada)\",\n  \"description\": \"Reunião com a equipe de desenvolvimento e o cliente\",\n  \"start_date\": \"2025-05-25T09:30:00\",\n  \"end_date\": \"2025-05-25T11:30:00\",\n  \"event_type\": \"trabalho\",\n  \"location\": \"Sala de Conferência\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calendar/events/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calendar", "events", "1"]
+            },
+            "description": "Atualiza um evento existente no calendário"
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir Evento",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calendar/events/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calendar", "events", "1"]
+            },
+            "description": "Remove um evento do calendário"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ]
+} 
