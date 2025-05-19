@@ -7,3 +7,4 @@ from app.models.task import Task
 from app.models.event import Event
 from app.models.transaction import Transaction
 from app.models.health_record import HealthRecord 
+from app.models.finance import FinanceCategory, FinanceTransaction, FinanceBudget  # noqa 

@@ -33,6 +33,14 @@ async def home(request: Request):
         {"request": request, "title": "Family Dashboard"}
     )
 
+@app.get("/tasks")
+async def tasks(request: Request):
+    return templates.TemplateResponse("tasks.html", {"request": request})
+
+@app.get("/finances")
+async def finances(request: Request):
+    return templates.TemplateResponse("finances.html", {"request": request})
+
 # Import and include routers
 from app.api.api_v1.api import api_router
 

@@ -9,6 +9,7 @@ class Family(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True, nullable=False)
+    description = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -17,4 +18,7 @@ class Family(Base):
     tasks = relationship("Task", back_populates="family")
     events = relationship("Event", back_populates="family")
     transactions = relationship("Transaction", back_populates="family")
-    health_records = relationship("HealthRecord", back_populates="family") 
+    health_records = relationship("HealthRecord", back_populates="family")
+    finance_categories = relationship("FinanceCategory", back_populates="family")
+    finance_transactions = relationship("FinanceTransaction", back_populates="family")
+    finance_budgets = relationship("FinanceBudget", back_populates="family") 
