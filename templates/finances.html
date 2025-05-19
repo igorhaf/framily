@@ -155,33 +155,70 @@
                 categoryNames[cat.id] = cat.name;
             });
             
-            categoryBudget.innerHTML = Object.entries(data.category_summary).map(([categoryId, info]) => `
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <h4 class="text-sm font-medium text-gray-900">${categoryNames[categoryId] || 'Categoria'}</h4>
-                        <span class="text-sm text-gray-500">${formatCurrency(info.budget || 0)}</span>
+            // Agrupa categorias por tipo
+            const incomeCategories = [];
+            const expenseCategories = [];
+            
+            Object.entries(data.category_summary).forEach(([categoryId, info]) => {
+                const category = {
+                    id: categoryId,
+                    name: categoryNames[categoryId] || 'Categoria',
+                    ...info
+                };
+                
+                if (info.type === 'INCOME' && info.income > 0) {
+                    incomeCategories.push(category);
+                } else if (info.type === 'EXPENSE' && info.expense > 0) {
+                    expenseCategories.push(category);
+                }
+            });
+            
+            // Renderiza as categorias
+            categoryBudget.innerHTML = `
+                ${incomeCategories.length > 0 ? `
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-gray-900 mb-4">Receitas</h4>
+                        ${incomeCategories.map(cat => `
+                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="text-sm font-medium text-gray-900">${cat.name}</h4>
+                                    <span class="text-sm text-gray-500">${formatCurrency(cat.income)}</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                                    <div class="bg-green-600 h-2.5 rounded-full" 
+                                         style="width: ${Math.min((cat.income / data.total_income) * 100, 100)}%"></div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-500">Recebido: ${formatCurrency(cat.income)}</span>
+                                    <span class="text-sm text-gray-500">Total: ${formatCurrency(cat.income)}</span>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
-                    ${info.type === 'INCOME' ? `
-                        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                            <div class="bg-green-600 h-2.5 rounded-full" 
-                                 style="width: ${Math.min(((info.income || 0) / (info.budget || 1)) * 100, 100)}%"></div>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500">Recebido: ${formatCurrency(info.income || 0)}</span>
-                            <span class="text-sm text-gray-500">Meta: ${formatCurrency(info.budget || 0)}</span>
-                        </div>
-                    ` : `
-                        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                            <div class="bg-${(info.expense || 0) > (info.budget || 0) ? 'red' : 'blue'}-600 h-2.5 rounded-full" 
-                                 style="width: ${Math.min(((info.expense || 0) / (info.budget || 1)) * 100, 100)}%"></div>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500">Gasto: ${formatCurrency(info.expense || 0)}</span>
-                            <span class="text-sm text-gray-500">Restante: ${formatCurrency((info.budget || 0) - (info.expense || 0))}</span>
-                        </div>
-                    `}
-                </div>
-            `).join('');
+                ` : ''}
+                
+                ${expenseCategories.length > 0 ? `
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-900 mb-4">Despesas</h4>
+                        ${expenseCategories.map(cat => `
+                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="text-sm font-medium text-gray-900">${cat.name}</h4>
+                                    <span class="text-sm text-gray-500">${formatCurrency(cat.expense)}</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                                    <div class="bg-blue-600 h-2.5 rounded-full" 
+                                         style="width: ${Math.min((cat.expense / data.total_expenses) * 100, 100)}%"></div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-500">Gasto: ${formatCurrency(cat.expense)}</span>
+                                    <span class="text-sm text-gray-500">Orçamento: ${formatCurrency(cat.expense)}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            `;
             
         } catch (error) {
             console.error('Erro ao carregar resumo financeiro:', error);

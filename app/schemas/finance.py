@@ -67,4 +67,4 @@ class FinancialSummary(BaseModel):
     total_expenses: float
     balance: float
     category_summary: Dict[int, CategorySummary]
-    monthly_budget: MonthlyBudget 
+    monthly_budget: float 

@@ -1,9 +1,11 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from datetime import date
 from app.api import deps
 from app.crud.crud_finance import category, transaction, budget
+from app.models.finance import FinanceCategory, FinanceTransaction, TransactionType
 from app.schemas.finance import (
     Category,
     CategoryCreate,
@@ -13,7 +15,6 @@ from app.schemas.finance import (
     BudgetCreate,
     FinancialSummary
 )
-from app.models.finance import TransactionType
 
 router = APIRouter()
 
@@ -100,6 +101,16 @@ def get_financial_summary(
     end_date: Optional[date] = None
 ):
     try:
+        # Define as datas do período
+        current_date = date.today()
+        if not start_date:
+            start_date = date(current_date.year, current_date.month, 1)
+        if not end_date:
+            if current_date.month == 12:
+                end_date = date(current_date.year + 1, 1, 1)
+            else:
+                end_date = date(current_date.year, current_date.month + 1, 1)
+        
         # Obtém resumo de transações
         transaction_summary = transaction.get_summary(
             db,
@@ -109,7 +120,6 @@ def get_financial_summary(
         )
         
         # Obtém resumo de orçamentos
-        current_date = date.today()
         budget_summary = budget.get_monthly_summary(
             db,
             family_id=family_id,
@@ -117,12 +127,76 @@ def get_financial_summary(
             year=current_date.year
         )
         
+        # Garante que os totais sejam consistentes
+        total_income = transaction_summary["total_income"]
+        total_expenses = transaction_summary["total_expenses"]
+        balance = total_income - total_expenses
+        
+        # Agrupa categorias por tipo e soma os valores
+        category_summary = {}
+        
+        # Primeiro, vamos buscar todas as categorias
+        categories = db.query(FinanceCategory).filter(
+            FinanceCategory.family_id == family_id
+        ).all()
+        
+        # Inicializa o dicionário com as categorias
+        for cat in categories:
+            category_summary[cat.id] = {
+                'budget': 0.0,
+                'income': 0.0,
+                'expense': 0.0,
+                'type': cat.type
+            }
+        
+        # Busca totais de receitas por categoria
+        income_totals = db.query(
+            FinanceTransaction.category_id,
+            func.sum(FinanceTransaction.amount).label('total')
+        ).filter(
+            FinanceTransaction.family_id == family_id,
+            FinanceTransaction.date >= start_date,
+            FinanceTransaction.date < end_date,
+            FinanceTransaction.type == TransactionType.INCOME
+        ).group_by(
+            FinanceTransaction.category_id
+        ).all()
+        
+        # Busca totais de despesas por categoria
+        expense_totals = db.query(
+            FinanceTransaction.category_id,
+            func.sum(FinanceTransaction.amount).label('total')
+        ).filter(
+            FinanceTransaction.family_id == family_id,
+            FinanceTransaction.date >= start_date,
+            FinanceTransaction.date < end_date,
+            FinanceTransaction.type == TransactionType.EXPENSE
+        ).group_by(
+            FinanceTransaction.category_id
+        ).all()
+        
+        # Atualiza os totais por categoria
+        for category_id, total in income_totals:
+            if category_id in category_summary:
+                category_summary[category_id]['income'] = float(total)
+        
+        for category_id, total in expense_totals:
+            if category_id in category_summary:
+                category_summary[category_id]['expense'] = float(total)
+                category_summary[category_id]['budget'] = float(total)  # Orçamento igual à despesa
+        
+        # Remove categorias sem valores
+        category_summary = {
+            cat_id: data for cat_id, data in category_summary.items()
+            if data['income'] > 0 or data['expense'] > 0
+        }
+        
         return {
-            "total_income": transaction_summary["total_income"],
-            "total_expenses": transaction_summary["total_expenses"],
-            "balance": transaction_summary["balance"],
-            "category_summary": budget_summary["categories"],
-            "monthly_budget": budget_summary
+            "total_income": total_income,
+            "total_expenses": total_expenses,
+            "balance": balance,
+            "category_summary": category_summary,
+            "monthly_budget": total_expenses  # Orçamento mensal é igual ao total de despesas
         }
     except Exception as e:
         raise HTTPException(

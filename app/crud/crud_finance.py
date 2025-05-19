@@ -79,21 +79,30 @@ class CRUDTransaction(CRUDBase[FinanceTransaction, TransactionCreate, Transactio
             else:
                 end_date = date(current_date.year, current_date.month + 1, 1)
         
-        # Busca todas as transações do período
-        transactions = db.query(self.model).filter(
-            self.model.family_id == family_id,
-            self.model.date >= start_date,
-            self.model.date < end_date
-        ).all()
+        # Busca totais de receitas
+        income_total = db.query(
+            func.sum(FinanceTransaction.amount)
+        ).filter(
+            FinanceTransaction.family_id == family_id,
+            FinanceTransaction.date >= start_date,
+            FinanceTransaction.date < end_date,
+            FinanceTransaction.type == TransactionType.INCOME
+        ).scalar() or 0
         
-        # Calcula totais
-        total_income = sum(t.amount for t in transactions if t.type == TransactionType.INCOME)
-        total_expenses = sum(t.amount for t in transactions if t.type == TransactionType.EXPENSE)
+        # Busca totais de despesas
+        expense_total = db.query(
+            func.sum(FinanceTransaction.amount)
+        ).filter(
+            FinanceTransaction.family_id == family_id,
+            FinanceTransaction.date >= start_date,
+            FinanceTransaction.date < end_date,
+            FinanceTransaction.type == TransactionType.EXPENSE
+        ).scalar() or 0
         
         return {
-            'total_income': total_income,
-            'total_expenses': total_expenses,
-            'balance': total_income - total_expenses
+            'total_income': float(income_total),
+            'total_expenses': float(expense_total),
+            'balance': float(income_total - expense_total)
         }
 
 class CRUDBudget(CRUDBase[FinanceBudget, BudgetCreate, BudgetCreate]):
@@ -130,9 +139,6 @@ class CRUDBudget(CRUDBase[FinanceBudget, BudgetCreate, BudgetCreate]):
         month: int,
         year: int
     ) -> Dict:
-        # Busca orçamentos do mês
-        budgets = self.get_by_family(db, family_id=family_id, month=month, year=year)
-        
         # Busca transações do mês
         start_date = date(year, month, 1)
         if month == 12:
@@ -144,19 +150,9 @@ class CRUDBudget(CRUDBase[FinanceBudget, BudgetCreate, BudgetCreate]):
         categories = db.query(FinanceCategory).filter(
             FinanceCategory.family_id == family_id
         ).all()
-        category_types = {cat.id: cat.type for cat in categories}
-            
-        # Busca transações do mês
-        transactions = db.query(FinanceTransaction).filter(
-            FinanceTransaction.family_id == family_id,
-            FinanceTransaction.date >= start_date,
-            FinanceTransaction.date < end_date
-        ).all()
         
-        # Calcula totais por categoria
+        # Inicializa o dicionário de totais por categoria
         category_totals = {}
-        
-        # Inicializa todas as categorias
         for cat in categories:
             category_totals[cat.id] = {
                 'budget': 0.0,
@@ -165,23 +161,60 @@ class CRUDBudget(CRUDBase[FinanceBudget, BudgetCreate, BudgetCreate]):
                 'type': cat.type
             }
         
-        # Adiciona orçamentos
-        for budget in budgets:
-            if budget.category_id in category_totals:
-                category_totals[budget.category_id]['budget'] = budget.amount
+        # Busca totais de receitas por categoria
+        income_totals = db.query(
+            FinanceTransaction.category_id,
+            func.sum(FinanceTransaction.amount).label('total')
+        ).filter(
+            FinanceTransaction.family_id == family_id,
+            FinanceTransaction.date >= start_date,
+            FinanceTransaction.date < end_date,
+            FinanceTransaction.type == TransactionType.INCOME
+        ).group_by(
+            FinanceTransaction.category_id
+        ).all()
         
-        # Soma transações
-        for transaction in transactions:
-            if transaction.category_id in category_totals:
-                if transaction.type == TransactionType.INCOME:
-                    category_totals[transaction.category_id]['income'] += transaction.amount
-                else:
-                    category_totals[transaction.category_id]['expense'] += transaction.amount
+        # Busca totais de despesas por categoria
+        expense_totals = db.query(
+            FinanceTransaction.category_id,
+            func.sum(FinanceTransaction.amount).label('total')
+        ).filter(
+            FinanceTransaction.family_id == family_id,
+            FinanceTransaction.date >= start_date,
+            FinanceTransaction.date < end_date,
+            FinanceTransaction.type == TransactionType.EXPENSE
+        ).group_by(
+            FinanceTransaction.category_id
+        ).all()
+        
+        # Calcula totais
+        total_income = 0
+        total_expenses = 0
+        
+        # Atualiza totais de receitas
+        for category_id, total in income_totals:
+            if category_id in category_totals:
+                category_totals[category_id]['income'] = float(total)
+                total_income += float(total)
+        
+        # Atualiza totais de despesas
+        for category_id, total in expense_totals:
+            if category_id in category_totals:
+                category_totals[category_id]['expense'] = float(total)
+                category_totals[category_id]['budget'] = float(total)  # Orçamento igual à despesa
+                total_expenses += float(total)
+        
+        # O orçamento mensal total é igual ao total de despesas
+        monthly_budget = total_expenses
         
         return {
             'categories': category_totals,
             'month': month,
-            'year': year
+            'year': year,
+            'total_income': total_income,
+            'total_expenses': total_expenses,
+            'balance': total_income - total_expenses,
+            'monthly_budget': monthly_budget
         }
 
 category = CRUDCategory(FinanceCategory)

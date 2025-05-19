@@ -176,7 +176,38 @@
         }
     }
 
+    // Função para formatar valores monetários
+    function formatCurrency(value) {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(value);
+    }
+
+    // Função para carregar o orçamento mensal
+    async function loadMonthlyBudget() {
+        try {
+            const response = await fetch('/api/v1/finance/summary/');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || `Erro HTTP! status: ${response.status}`);
+            }
+            const data = await response.json();
+            
+            // O orçamento mensal é igual ao total de despesas
+            const monthlyBudget = data.monthly_budget || data.total_expenses || 0;
+            
+            document.getElementById('monthlyBudget').textContent = formatCurrency(monthlyBudget);
+        } catch (error) {
+            console.error('Erro ao carregar orçamento mensal:', error);
+            document.getElementById('monthlyBudget').textContent = 'Erro';
+        }
+    }
+
     // Carrega os dados quando a página carregar
-    document.addEventListener('DOMContentLoaded', loadTasks);
+    document.addEventListener('DOMContentLoaded', () => {
+        loadTasks();
+        loadMonthlyBudget();
+    });
 </script>
 {% endblock %} 
