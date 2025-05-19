@@ -14,7 +14,9 @@ from app.schemas.health import (
     HealthExamCreate,
     HealthExamUpdate
 )
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Endpoints para Consultas
@@ -102,7 +104,14 @@ def create_medication(
     """
     Cria novo registro de medicamento.
     """
-    return health_medication.create(db=db, obj_in=medication_in)
+    try:
+        return health_medication.create(db=db, obj_in=medication_in)
+    except Exception as e:
+        logger.error(f"Erro ao criar medicamento: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao criar medicamento: {str(e)}"
+        )
 
 @router.put("/medications/{medication_id}", response_model=HealthMedication)
 def update_medication(

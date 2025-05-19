@@ -10,6 +10,11 @@ class AppointmentType(str, enum.Enum):
     EXAME = "exame"
     VACINA = "vacina"
 
+class MedicationStatus(str, enum.Enum):
+    ATIVO = "ativo"
+    SUSPENSO = "suspenso"
+    FINALIZADO = "finalizado"
+
 class HealthAppointment(Base):
     __tablename__ = "health_appointments"
 
@@ -36,7 +41,7 @@ class HealthMedication(Base):
     frequency = Column(String, nullable=False)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date)
-    status = Column(String, default="ativo")
+    status = Column(Enum(MedicationStatus), default=MedicationStatus.ATIVO)
     notes = Column(Text)
 
     family_member = relationship("FamilyMember", back_populates="medications")

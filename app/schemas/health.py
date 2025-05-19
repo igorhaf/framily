@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import date
 from typing import Optional
-from app.models.health import AppointmentType
+from app.models.health import AppointmentType, MedicationStatus
 
 class HealthAppointmentBase(BaseModel):
     family_member_id: int
@@ -33,7 +33,7 @@ class HealthMedicationBase(BaseModel):
     frequency: str
     start_date: date
     end_date: Optional[date] = None
-    status: str = "ativo"
+    status: MedicationStatus = MedicationStatus.ATIVO
     notes: Optional[str] = None
 
 class HealthMedicationCreate(HealthMedicationBase):
