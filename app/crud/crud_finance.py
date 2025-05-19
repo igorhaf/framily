@@ -66,32 +66,35 @@ class CRUDTransaction(CRUDBase[FinanceTransaction, TransactionCreate, Transactio
         start_date: Optional[date] = None,
         end_date: Optional[date] = None
     ) -> Dict:
-        query = db.query(
-            self.model.type,
-            func.sum(self.model.amount).label('total')
-        ).filter(self.model.family_id == family_id)
+        # Se não houver data de início, usa o primeiro dia do mês atual
+        if not start_date:
+            current_date = date.today()
+            start_date = date(current_date.year, current_date.month, 1)
         
-        if start_date:
-            query = query.filter(self.model.date >= start_date)
-        if end_date:
-            query = query.filter(self.model.date <= end_date)
-            
-        results = query.group_by(self.model.type).all()
-        
-        summary = {
-            'total_income': 0.0,
-            'total_expenses': 0.0,
-            'balance': 0.0
-        }
-        
-        for type_, total in results:
-            if type_ == TransactionType.INCOME:
-                summary['total_income'] = total
+        # Se não houver data de fim, usa o último dia do mês atual
+        if not end_date:
+            current_date = date.today()
+            if current_date.month == 12:
+                end_date = date(current_date.year + 1, 1, 1)
             else:
-                summary['total_expenses'] = total
-                
-        summary['balance'] = summary['total_income'] - summary['total_expenses']
-        return summary
+                end_date = date(current_date.year, current_date.month + 1, 1)
+        
+        # Busca todas as transações do período
+        transactions = db.query(self.model).filter(
+            self.model.family_id == family_id,
+            self.model.date >= start_date,
+            self.model.date < end_date
+        ).all()
+        
+        # Calcula totais
+        total_income = sum(t.amount for t in transactions if t.type == TransactionType.INCOME)
+        total_expenses = sum(t.amount for t in transactions if t.type == TransactionType.EXPENSE)
+        
+        return {
+            'total_income': total_income,
+            'total_expenses': total_expenses,
+            'balance': total_income - total_expenses
+        }
 
 class CRUDBudget(CRUDBase[FinanceBudget, BudgetCreate, BudgetCreate]):
     def get_by_family(
@@ -137,6 +140,13 @@ class CRUDBudget(CRUDBase[FinanceBudget, BudgetCreate, BudgetCreate]):
         else:
             end_date = date(year, month + 1, 1)
             
+        # Busca categorias
+        categories = db.query(FinanceCategory).filter(
+            FinanceCategory.family_id == family_id
+        ).all()
+        category_types = {cat.id: cat.type for cat in categories}
+            
+        # Busca transações do mês
         transactions = db.query(FinanceTransaction).filter(
             FinanceTransaction.family_id == family_id,
             FinanceTransaction.date >= start_date,
@@ -145,24 +155,28 @@ class CRUDBudget(CRUDBase[FinanceBudget, BudgetCreate, BudgetCreate]):
         
         # Calcula totais por categoria
         category_totals = {}
-        for transaction in transactions:
-            if transaction.category_id not in category_totals:
-                category_totals[transaction.category_id] = {
-                    'budget': 0.0,
-                    'spent': 0.0
-                }
-            
-            if transaction.type == TransactionType.EXPENSE:
-                category_totals[transaction.category_id]['spent'] += transaction.amount
+        
+        # Inicializa todas as categorias
+        for cat in categories:
+            category_totals[cat.id] = {
+                'budget': 0.0,
+                'income': 0.0,
+                'expense': 0.0,
+                'type': cat.type
+            }
         
         # Adiciona orçamentos
         for budget in budgets:
-            if budget.category_id not in category_totals:
-                category_totals[budget.category_id] = {
-                    'budget': 0.0,
-                    'spent': 0.0
-                }
-            category_totals[budget.category_id]['budget'] = budget.amount
+            if budget.category_id in category_totals:
+                category_totals[budget.category_id]['budget'] = budget.amount
+        
+        # Soma transações
+        for transaction in transactions:
+            if transaction.category_id in category_totals:
+                if transaction.type == TransactionType.INCOME:
+                    category_totals[transaction.category_id]['income'] += transaction.amount
+                else:
+                    category_totals[transaction.category_id]['expense'] += transaction.amount
         
         return {
             'categories': category_totals,

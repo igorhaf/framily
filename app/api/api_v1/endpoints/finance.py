@@ -99,27 +99,33 @@ def get_financial_summary(
     start_date: Optional[date] = None,
     end_date: Optional[date] = None
 ):
-    # Obtém resumo de transações
-    transaction_summary = transaction.get_summary(
-        db,
-        family_id=family_id,
-        start_date=start_date,
-        end_date=end_date
-    )
-    
-    # Obtém resumo de orçamentos
-    current_date = date.today()
-    budget_summary = budget.get_monthly_summary(
-        db,
-        family_id=family_id,
-        month=current_date.month,
-        year=current_date.year
-    )
-    
-    return {
-        "total_income": transaction_summary["total_income"],
-        "total_expenses": transaction_summary["total_expenses"],
-        "balance": transaction_summary["balance"],
-        "category_summary": budget_summary["categories"],
-        "monthly_budget": budget_summary
-    } 
+    try:
+        # Obtém resumo de transações
+        transaction_summary = transaction.get_summary(
+            db,
+            family_id=family_id,
+            start_date=start_date,
+            end_date=end_date
+        )
+        
+        # Obtém resumo de orçamentos
+        current_date = date.today()
+        budget_summary = budget.get_monthly_summary(
+            db,
+            family_id=family_id,
+            month=current_date.month,
+            year=current_date.year
+        )
+        
+        return {
+            "total_income": transaction_summary["total_income"],
+            "total_expenses": transaction_summary["total_expenses"],
+            "balance": transaction_summary["balance"],
+            "category_summary": budget_summary["categories"],
+            "monthly_budget": budget_summary
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao gerar resumo financeiro: {str(e)}"
+        ) 

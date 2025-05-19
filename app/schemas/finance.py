@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Dict
 from datetime import date
 from app.models.finance import TransactionType
 
@@ -51,9 +51,20 @@ class Budget(BudgetBase):
     class Config:
         from_attributes = True
 
+class CategorySummary(BaseModel):
+    budget: float
+    income: float
+    expense: float
+    type: TransactionType
+
+class MonthlyBudget(BaseModel):
+    categories: Dict[int, CategorySummary]
+    month: int
+    year: int
+
 class FinancialSummary(BaseModel):
     total_income: float
     total_expenses: float
     balance: float
-    category_summary: List[dict]
-    monthly_budget: List[dict] 
+    category_summary: Dict[int, CategorySummary]
+    monthly_budget: MonthlyBudget 

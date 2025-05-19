@@ -127,36 +127,59 @@
         try {
             const response = await fetch('/api/v1/finance/summary/');
             if (!response.ok) {
-                throw new Error(`Erro HTTP! status: ${response.status}`);
+                const errorData = await response.json();
+                throw new Error(errorData.detail || `Erro HTTP! status: ${response.status}`);
             }
             const data = await response.json();
             
             // Atualiza os totais
-            document.getElementById('totalIncome').textContent = formatCurrency(data.total_income);
-            document.getElementById('totalExpenses').textContent = formatCurrency(data.total_expenses);
-            document.getElementById('balance').textContent = formatCurrency(data.balance);
+            document.getElementById('totalIncome').textContent = formatCurrency(data.total_income || 0);
+            document.getElementById('totalExpenses').textContent = formatCurrency(data.total_expenses || 0);
+            document.getElementById('balance').textContent = formatCurrency(data.balance || 0);
             
             // Atualiza o orçamento por categoria
             const categoryBudget = document.getElementById('categoryBudget');
-            if (Object.keys(data.category_summary).length === 0) {
+            if (!data.category_summary || Object.keys(data.category_summary).length === 0) {
                 categoryBudget.innerHTML = '<div class="text-center text-gray-500">Nenhuma categoria encontrada</div>';
                 return;
             }
             
+            // Primeiro, vamos buscar os nomes das categorias
+            const categoriesResponse = await fetch('/api/v1/finance/categories/');
+            if (!categoriesResponse.ok) {
+                throw new Error(`Erro ao carregar categorias: ${categoriesResponse.status}`);
+            }
+            const categories = await categoriesResponse.json();
+            const categoryNames = {};
+            categories.forEach(cat => {
+                categoryNames[cat.id] = cat.name;
+            });
+            
             categoryBudget.innerHTML = Object.entries(data.category_summary).map(([categoryId, info]) => `
                 <div class="bg-gray-50 rounded-lg p-4">
                     <div class="flex justify-between items-center mb-2">
-                        <h4 class="text-sm font-medium text-gray-900">${info.category_name || 'Categoria'}</h4>
-                        <span class="text-sm text-gray-500">${formatCurrency(info.budget)}</span>
+                        <h4 class="text-sm font-medium text-gray-900">${categoryNames[categoryId] || 'Categoria'}</h4>
+                        <span class="text-sm text-gray-500">${formatCurrency(info.budget || 0)}</span>
                     </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5">
-                        <div class="bg-${info.spent > info.budget ? 'red' : 'blue'}-600 h-2.5 rounded-full" 
-                             style="width: ${Math.min((info.spent / info.budget) * 100, 100)}%"></div>
-                    </div>
-                    <div class="flex justify-between items-center mt-2">
-                        <span class="text-sm text-gray-500">Gasto: ${formatCurrency(info.spent)}</span>
-                        <span class="text-sm text-gray-500">Restante: ${formatCurrency(info.budget - info.spent)}</span>
-                    </div>
+                    ${info.type === 'INCOME' ? `
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                            <div class="bg-green-600 h-2.5 rounded-full" 
+                                 style="width: ${Math.min(((info.income || 0) / (info.budget || 1)) * 100, 100)}%"></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Recebido: ${formatCurrency(info.income || 0)}</span>
+                            <span class="text-sm text-gray-500">Meta: ${formatCurrency(info.budget || 0)}</span>
+                        </div>
+                    ` : `
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                            <div class="bg-${(info.expense || 0) > (info.budget || 0) ? 'red' : 'blue'}-600 h-2.5 rounded-full" 
+                                 style="width: ${Math.min(((info.expense || 0) / (info.budget || 1)) * 100, 100)}%"></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Gasto: ${formatCurrency(info.expense || 0)}</span>
+                            <span class="text-sm text-gray-500">Restante: ${formatCurrency((info.budget || 0) - (info.expense || 0))}</span>
+                        </div>
+                    `}
                 </div>
             `).join('');
             
@@ -188,23 +211,37 @@
                 return;
             }
             
+            // Buscar nomes das categorias
+            const categoriesResponse = await fetch('/api/v1/finance/categories/');
+            if (!categoriesResponse.ok) {
+                throw new Error(`Erro ao carregar categorias: ${categoriesResponse.status}`);
+            }
+            const categories = await categoriesResponse.json();
+            const categoryNames = {};
+            categories.forEach(cat => {
+                categoryNames[cat.id] = cat.name;
+            });
+            
             recentTransactions.innerHTML = transactions.map(transaction => `
                 <div class="flex items-center justify-between py-3 border-b border-gray-200 last:border-0">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <svg class="h-6 w-6 ${transaction.type === 'income' ? 'text-green-400' : 'text-red-400'}" 
+                            <svg class="h-6 w-6 ${transaction.type === 'INCOME' ? 'text-green-400' : 'text-red-400'}" 
                                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                       d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-900">${transaction.description || 'Sem descrição'}</p>
-                            <p class="text-sm text-gray-500">${new Date(transaction.date).toLocaleDateString()}</p>
+                            <p class="text-sm font-medium text-gray-900">${categoryNames[transaction.category_id] || 'Categoria'}</p>
+                            <p class="text-sm text-gray-500">${transaction.description}</p>
                         </div>
                     </div>
-                    <div class="text-sm font-medium ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}">
-                        ${transaction.type === 'income' ? '+' : '-'}${formatCurrency(transaction.amount)}
+                    <div class="ml-4 flex-shrink-0">
+                        <p class="text-sm font-medium ${transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'}">
+                            ${transaction.type === 'INCOME' ? '+' : '-'}${formatCurrency(transaction.amount)}
+                        </p>
+                        <p class="text-sm text-gray-500">${new Date(transaction.date).toLocaleDateString('pt-BR')}</p>
                     </div>
                 </div>
             `).join('');
@@ -219,7 +256,7 @@
         }
     }
 
-    // Carrega os dados quando a página carregar
+    // Carregar dados quando a página carregar
     document.addEventListener('DOMContentLoaded', () => {
         loadFinancialSummary();
         loadRecentTransactions();

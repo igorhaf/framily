@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3eb0fcfe-8f57-41b5-bc74-42454b02eeb0" name="Changes" comment="" />
+    <list default="true" id="3eb0fcfe-8f57-41b5-bc74-42454b02eeb0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/crud/crud_finance.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/crud/crud_finance.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/finance.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/finance.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/finance.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/finance.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/finances.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/finances.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -78,7 +84,7 @@
       <option name="presentableId" value="Default" />
       <updated>1747510720819</updated>
       <workItem from="1747510722021" duration="1392000" />
-      <workItem from="1747567585110" duration="5466000" />
+      <workItem from="1747567585110" duration="7108000" />
     </task>
     <servers />
   </component>
