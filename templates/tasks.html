@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Tasks{% endblock %}
+{% block title %}Tarefas{% endblock %}
 
 {% block content %}
 <div class="bg-white shadow overflow-hidden sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">Tasks</h3>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">Family tasks and to-dos.</p>
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Tarefas</h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">Tarefas e afazeres da família.</p>
     </div>
     <div class="border-t border-gray-200">
         <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <div class="text-sm font-medium text-gray-500">Current Tasks</div>
+            <div class="text-sm font-medium text-gray-500">Tarefas Atuais</div>
             <div class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                 <ul role="list" class="divide-y divide-gray-200">
-                    <!-- Tasks will be loaded dynamically via JavaScript -->
-                    <li class="py-4">Loading tasks...</li>
+                    <!-- Tarefas serão carregadas dinamicamente via JavaScript -->
+                    <li class="py-4">Carregando tarefas...</li>
                 </ul>
             </div>
         </div>
@@ -22,22 +22,22 @@
 </div>
 
 <script>
-    // Fetch tasks from the API
+    // Função para carregar as tarefas
     async function loadTasks() {
         try {
             const response = await fetch('/api/v1/tasks/');
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`Erro HTTP! status: ${response.status}`);
             }
             const tasks = await response.json();
             
             const tasksList = document.querySelector('ul');
             if (!Array.isArray(tasks)) {
-                throw new Error('Expected tasks to be an array');
+                throw new Error('Esperava que as tarefas fossem um array');
             }
             
             if (tasks.length === 0) {
-                tasksList.innerHTML = '<li class="py-4">No tasks found</li>';
+                tasksList.innerHTML = '<li class="py-4 text-center text-gray-500">Nenhuma tarefa encontrada</li>';
                 return;
             }
             
@@ -47,12 +47,12 @@
                         <div class="flex-1 space-y-1">
                             <div class="flex items-center justify-between">
                                 <h3 class="text-sm font-medium">${task.title}</h3>
-                                <p class="text-sm text-gray-500">${task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No due date'}</p>
+                                <p class="text-sm text-gray-500">${task.due_date ? new Date(task.due_date).toLocaleDateString() : 'Sem data de vencimento'}</p>
                             </div>
-                            <p class="text-sm text-gray-500">${task.description || 'No description'}</p>
+                            <p class="text-sm text-gray-500">${task.description || 'Sem descrição'}</p>
                             <div class="flex items-center">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${task.completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
-                                    ${task.completed ? 'Completed' : 'Pending'}
+                                    ${task.completed ? 'Concluída' : 'Pendente'}
                                 </span>
                             </div>
                         </div>
@@ -60,13 +60,13 @@
                 </li>
             `).join('');
         } catch (error) {
-            console.error('Error loading tasks:', error);
+            console.error('Erro ao carregar tarefas:', error);
             const tasksList = document.querySelector('ul');
-            tasksList.innerHTML = `<li class="py-4 text-red-600">Error loading tasks: ${error.message}</li>`;
+            tasksList.innerHTML = `<li class="py-4 text-red-600">Erro ao carregar tarefas: ${error.message}</li>`;
         }
     }
 
-    // Load tasks when the page loads
+    // Carrega as tarefas quando a página carregar
     document.addEventListener('DOMContentLoaded', loadTasks);
 </script>
 {% endblock %} 

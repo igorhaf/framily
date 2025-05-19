@@ -16,11 +16,11 @@
                 <div class="ml-5 w-0 flex-1">
                     <dl>
                         <dt class="text-sm font-medium text-gray-500 truncate">
-                            Upcoming Events
+                            Próximos Eventos
                         </dt>
                         <dd class="flex items-baseline">
-                            <div class="text-2xl font-semibold text-gray-900">
-                                3
+                            <div class="text-2xl font-semibold text-gray-900" id="eventCount">
+                                Carregando...
                             </div>
                         </dd>
                     </dl>
@@ -30,7 +30,7 @@
         <div class="bg-gray-50 px-5 py-3">
             <div class="text-sm">
                 <a href="/calendar" class="font-medium text-indigo-600 hover:text-indigo-500">
-                    View calendar
+                    Ver calendário
                 </a>
             </div>
         </div>
@@ -48,11 +48,11 @@
                 <div class="ml-5 w-0 flex-1">
                     <dl>
                         <dt class="text-sm font-medium text-gray-500 truncate">
-                            Pending Tasks
+                            Tarefas Pendentes
                         </dt>
                         <dd class="flex items-baseline">
-                            <div class="text-2xl font-semibold text-gray-900">
-                                5
+                            <div class="text-2xl font-semibold text-gray-900" id="pendingTasksCount">
+                                Carregando...
                             </div>
                         </dd>
                     </dl>
@@ -62,7 +62,7 @@
         <div class="bg-gray-50 px-5 py-3">
             <div class="text-sm">
                 <a href="/tasks" class="font-medium text-indigo-600 hover:text-indigo-500">
-                    View tasks
+                    Ver tarefas
                 </a>
             </div>
         </div>
@@ -80,20 +80,11 @@
                 <div class="ml-5 w-0 flex-1">
                     <dl>
                         <dt class="text-sm font-medium text-gray-500 truncate">
-                            Monthly Budget
+                            Orçamento Mensal
                         </dt>
                         <dd class="flex items-baseline">
-                            <div class="text-2xl font-semibold text-gray-900">
-                                $2,500
-                            </div>
-                            <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
-                                <svg class="self-center flex-shrink-0 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                </svg>
-                                <span class="sr-only">
-                                    Increased by
-                                </span>
-                                20%
+                            <div class="text-2xl font-semibold text-gray-900" id="monthlyBudget">
+                                Carregando...
                             </div>
                         </dd>
                     </dl>
@@ -103,7 +94,7 @@
         <div class="bg-gray-50 px-5 py-3">
             <div class="text-sm">
                 <a href="/finances" class="font-medium text-indigo-600 hover:text-indigo-500">
-                    View finances
+                    Ver finanças
                 </a>
             </div>
         </div>
@@ -112,41 +103,80 @@
 
 <!-- Recent Activity -->
 <div class="mt-8">
-    <h2 class="text-lg leading-6 font-medium text-gray-900">Recent Activity</h2>
+    <h2 class="text-lg leading-6 font-medium text-gray-900">Atividades Recentes</h2>
     <div class="mt-2 bg-white shadow overflow-hidden sm:rounded-md">
-        <ul role="list" class="divide-y divide-gray-200">
-            <li>
-                <a href="#" class="block hover:bg-gray-50">
-                    <div class="px-4 py-4 sm:px-6">
-                        <div class="flex items-center justify-between">
-                            <p class="text-sm font-medium text-indigo-600 truncate">
-                                New task assigned
-                            </p>
-                            <div class="ml-2 flex-shrink-0 flex">
-                                <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                    Task
-                                </p>
-                            </div>
-                        </div>
-                        <div class="mt-2 sm:flex sm:justify-between">
-                            <div class="sm:flex">
-                                <p class="flex items-center text-sm text-gray-500">
-                                    Take out the trash
-                                </p>
-                            </div>
-                            <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
-                                </svg>
-                                <p>
-                                    Due today
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </li>
+        <ul role="list" class="divide-y divide-gray-200" id="recentActivity">
+            <li class="py-4 text-center text-gray-500">Carregando atividades...</li>
         </ul>
     </div>
 </div>
+
+<script>
+    // Função para carregar as tarefas
+    async function loadTasks() {
+        try {
+            const response = await fetch('/api/v1/tasks/');
+            if (!response.ok) {
+                throw new Error(`Erro HTTP! status: ${response.status}`);
+            }
+            const tasks = await response.json();
+            
+            // Atualiza o contador de tarefas pendentes
+            const pendingTasks = tasks.filter(task => !task.completed);
+            document.getElementById('pendingTasksCount').textContent = pendingTasks.length;
+            
+            // Atualiza a lista de atividades recentes
+            const recentActivityList = document.getElementById('recentActivity');
+            if (tasks.length === 0) {
+                recentActivityList.innerHTML = '<li class="py-4 text-center text-gray-500">Nenhuma atividade recente</li>';
+                return;
+            }
+            
+            recentActivityList.innerHTML = tasks.slice(0, 5).map(task => `
+                <li>
+                    <a href="/tasks" class="block hover:bg-gray-50">
+                        <div class="px-4 py-4 sm:px-6">
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm font-medium text-indigo-600 truncate">
+                                    ${task.completed ? 'Tarefa concluída' : 'Nova tarefa'}
+                                </p>
+                                <div class="ml-2 flex-shrink-0 flex">
+                                    <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${task.completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                                        Tarefa
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-2 sm:flex sm:justify-between">
+                                <div class="sm:flex">
+                                    <p class="flex items-center text-sm text-gray-500">
+                                        ${task.title}
+                                    </p>
+                                </div>
+                                <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                                    <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                                    </svg>
+                                    <p>
+                                        ${task.due_date ? new Date(task.due_date).toLocaleDateString() : 'Sem data de vencimento'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            `).join('');
+        } catch (error) {
+            console.error('Erro ao carregar tarefas:', error);
+            document.getElementById('pendingTasksCount').textContent = 'Erro';
+            document.getElementById('recentActivity').innerHTML = `
+                <li class="py-4 text-center text-red-500">
+                    Erro ao carregar atividades: ${error.message}
+                </li>
+            `;
+        }
+    }
+
+    // Carrega os dados quando a página carregar
+    document.addEventListener('DOMContentLoaded', loadTasks);
+</script>
 {% endblock %} 
