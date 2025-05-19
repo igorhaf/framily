@@ -41,6 +41,14 @@ async def tasks(request: Request):
 async def finances(request: Request):
     return templates.TemplateResponse("finances.html", {"request": request})
 
+@app.get("/health")
+async def health(request: Request):
+    return templates.TemplateResponse("health.html", {"request": request})
+
+@app.get("/health-dashboard")
+async def health_dashboard(request: Request):
+    return templates.TemplateResponse("health_dashboard.html", {"request": request})
+
 # Import and include routers
 from app.api.api_v1.api import api_router
 

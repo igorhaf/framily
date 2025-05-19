@@ -1,13 +1,11 @@
-from .users import router as users_router
 from .tasks import router as tasks_router
-from .calendar import router as calendar_router
-from .finances import router as finances_router
+from .finance import router as finance_router
 from .health import router as health_router
+from .health_dashboard import router as health_dashboard_router
 
-users = users_router
 tasks = tasks_router
-calendar = calendar_router
-finances = finances_router
+finance = finance_router
 health = health_router
+health_dashboard = health_dashboard_router
 
-__all__ = ["users", "tasks", "calendar", "finances", "health"] 
+__all__ = ["tasks", "finance", "health", "health_dashboard"] 

@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard de Saúde{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Loading Indicator -->
+    <div id="loading" class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <span class="block sm:inline"></span>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div id="dashboard-content" class="hidden">
+        <!-- Resumo -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Próximas Consultas -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Próximas Consultas</h3>
+                <div id="appointments" class="space-y-4">
+                    <!-- Será preenchido via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Medicamentos Ativos -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Medicamentos Ativos</h3>
+                <div id="medications" class="space-y-4">
+                    <!-- Será preenchido via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Exames Pendentes -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Exames Pendentes</h3>
+                <div id="exams" class="space-y-4">
+                    <!-- Será preenchido via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Estatísticas</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-blue-600">Total de Consultas</h4>
+                    <p id="total-appointments" class="text-2xl font-bold text-blue-700">0</p>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-green-600">Medicamentos Ativos</h4>
+                    <p id="total-medications" class="text-2xl font-bold text-green-700">0</p>
+                </div>
+                <div class="bg-yellow-50 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-yellow-600">Exames Pendentes</h4>
+                    <p id="total-exams" class="text-2xl font-bold text-yellow-700">0</p>
+                </div>
+                <div class="bg-purple-50 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-purple-600">Membros da Família</h4>
+                    <p id="total-members" class="text-2xl font-bold text-purple-700">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Linha do Tempo -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Linha do Tempo</h3>
+            <div id="timeline" class="space-y-4">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        const errorMessage = errorDiv.querySelector('span');
+        errorMessage.textContent = message;
+        errorDiv.classList.remove('hidden');
+    }
+
+    async function loadHealthDashboard() {
+        try {
+            const [summaryRes, statsRes, timelineRes] = await Promise.all([
+                fetch('/api/v1/health-dashboard/summary'),
+                fetch('/api/v1/health-dashboard/stats'),
+                fetch('/api/v1/health-dashboard/timeline')
+            ]);
+
+            if (!summaryRes.ok || !statsRes.ok || !timelineRes.ok) {
+                throw new Error('Erro ao carregar dados do dashboard');
+            }
+
+            const [summary, stats, timeline] = await Promise.all([
+                summaryRes.json(),
+                statsRes.json(),
+                timelineRes.json()
+            ]);
+
+            // Preencher resumo
+            const appointmentsHtml = summary.appointments.map(apt => `
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <h4 class="font-medium text-blue-800">${apt.title}</h4>
+                    <p class="text-sm text-blue-600">${apt.date}</p>
+                    <p class="text-sm text-blue-600">${apt.member_name}</p>
+                </div>
+            `).join('');
+            document.getElementById('appointments').innerHTML = appointmentsHtml;
+
+            const medicationsHtml = summary.medications.map(med => `
+                <div class="bg-green-50 rounded-lg p-4">
+                    <h4 class="font-medium text-green-800">${med.name}</h4>
+                    <p class="text-sm text-green-600">${med.member_name}</p>
+                    <p class="text-sm text-green-600">${med.dosage}</p>
+                </div>
+            `).join('');
+            document.getElementById('medications').innerHTML = medicationsHtml;
+
+            const examsHtml = summary.exams.map(exam => `
+                <div class="bg-yellow-50 rounded-lg p-4">
+                    <h4 class="font-medium text-yellow-800">${exam.name}</h4>
+                    <p class="text-sm text-yellow-600">${exam.date}</p>
+                    <p class="text-sm text-yellow-600">${exam.member_name}</p>
+                </div>
+            `).join('');
+            document.getElementById('exams').innerHTML = examsHtml;
+
+            // Preencher estatísticas
+            document.getElementById('total-appointments').textContent = stats.total_appointments;
+            document.getElementById('total-medications').textContent = stats.total_medications;
+            document.getElementById('total-exams').textContent = stats.total_exams;
+            document.getElementById('total-members').textContent = stats.total_members;
+
+            // Preencher linha do tempo
+            const timelineHtml = timeline.events.map(event => `
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-100">
+                                <span class="text-sm font-medium leading-none text-blue-800">${event.type[0]}</span>
+                            </span>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-sm font-medium text-gray-900">${event.title}</h4>
+                            <p class="text-sm text-gray-500">${event.date}</p>
+                            <p class="text-sm text-gray-500">${event.member_name}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('timeline').innerHTML = timelineHtml;
+
+            // Esconder loading e mostrar conteúdo
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('dashboard-content').classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Erro:', error);
+            showError(error.message);
+            document.getElementById('loading').classList.add('hidden');
+        }
+    }
+
+    // Carregar dados quando a página carregar
+    document.addEventListener('DOMContentLoaded', loadHealthDashboard);
+</script>
+{% endblock %} 

@@ -17,9 +17,9 @@ class Event(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Foreign Keys
-    user_id = Column(Integer, ForeignKey("users.id"))
     family_id = Column(Integer, ForeignKey("families.id"))
+    family_member_id = Column(Integer, ForeignKey("family_members.id"), nullable=True)
     
     # Relationships
-    user = relationship("User", back_populates="events")
-    family = relationship("Family", back_populates="events") 
+    family = relationship("Family", back_populates="events")
+    family_member = relationship("FamilyMember", back_populates="events") 

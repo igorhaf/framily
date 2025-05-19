@@ -6,12 +6,33 @@
   <component name="ChangeListManager">
     <list default="true" id="3eb0fcfe-8f57-41b5-bc74-42454b02eeb0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/api_v1/endpoints/finance.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/api_v1/endpoints/finance.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/crud/crud_finance.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/crud/crud_finance.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/finance.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/finance.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/seed_finance.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/seed_finance.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/finances.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/finances.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/alembic/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/alembic/env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/alembic/script.py.mako" beforeDir="false" afterPath="$PROJECT_DIR$/alembic/script.py.mako" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/alembic/versions/20250518_0630_1735bfc7e274_initial_migration.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/alembic/versions/20250518_0913_ce6a893fa650_initial_migration.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/alembic/versions/20250519_1214_ce90a9ad24b7_add_finance_tables.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/alembic/versions/20250519_1217_bc0954cfd86f_rename_finance_tables.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/alembic/versions/20250519_1226_9244da05a26f_create_finance_tables.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/alembic/versions/20250519_1228_6fc9a71a4070_create_finance_tables_definitivo.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/api_v1/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/api_v1/api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/api_v1/endpoints/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/api_v1/endpoints/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/api_v1/endpoints/health.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/api_v1/endpoints/health.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/api_v1/endpoints/users.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/deps.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/deps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/db/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/db/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/db/init_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/db/init_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/event.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/event.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/family.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/family.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/health_record.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/task.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/task.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/transaction.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/user.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/health.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/health.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/transaction.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,22 +58,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "FastAPI.FastAPIProject.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "paginas-internas",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;FastAPI.FastAPIProject.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;paginas-internas&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="FastAPIProject" type="Python.FastAPI">
       <option name="file" value="$PROJECT_DIR$/main.py" />
