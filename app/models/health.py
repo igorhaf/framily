@@ -22,7 +22,7 @@ class HealthAppointment(Base):
     family_member_id = Column(Integer, ForeignKey("family_members.id"))
     date = Column(Date, nullable=False)
     time = Column(String, nullable=False)
-    type = Column(Enum(AppointmentType), nullable=False)
+    type = Column(String, nullable=False)
     doctor = Column(String, nullable=False)
     specialty = Column(String, nullable=False)
     location = Column(String)
@@ -41,7 +41,7 @@ class HealthMedication(Base):
     frequency = Column(String, nullable=False)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date)
-    status = Column(Enum(MedicationStatus), default=MedicationStatus.ATIVO)
+    status = Column(String, default='ativo')
     notes = Column(Text)
 
     family_member = relationship("FamilyMember", back_populates="medications")

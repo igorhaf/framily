@@ -1,21 +1,18 @@
 import os
 import sys
-import sqlalchemy
 from sqlalchemy import create_engine, text
 
-# Configuração do banco
-DATABASE_URL = os.getenv("DATABASE_URL") or "postgresql://postgres:postgres@localhost/family_dashboard"
+# Adicionar o diretório raiz ao PYTHONPATH antes de qualquer import do app
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(root_dir)
 
-engine = create_engine(DATABASE_URL)
+from app.core.config import settings
+
+# Conectar ao banco de dados
+engine = create_engine(settings.SQLALCHEMY_DATABASE_URI)
 
 with engine.connect() as conn:
-    print("Membros da família cadastrados:")
-    try:
-        result = conn.execute(text("SELECT id, name FROM family_members"))
-        rows = result.fetchall()
-        if not rows:
-            print("Nenhum membro encontrado.")
-        for row in rows:
-            print(f"id={row[0]}, nome={row[1]}")
-    except Exception as e:
-        print(f"Erro ao consultar membros da família: {e}") 
+    print("Membros de família disponíveis:")
+    result = conn.execute(text("SELECT id, name, family_id FROM family_members"))
+    for row in result:
+        print(f"ID: {row.id} | Nome: {row.name} | family_id: {row.family_id}") 

@@ -11,11 +11,6 @@ def get_multi(
 ) -> List[Task]:
     return db.query(Task).offset(skip).limit(limit).all()
 
-def get_multi_by_user(
-    db: Session, *, user_id: int, skip: int = 0, limit: int = 100
-) -> List[Task]:
-    return db.query(Task).filter(Task.user_id == user_id).offset(skip).limit(limit).all()
-
 def get_multi_by_family(
     db: Session, *, family_id: int, skip: int = 0, limit: int = 100
 ) -> List[Task]:
@@ -26,9 +21,9 @@ def create(db: Session, *, obj_in: TaskCreate) -> Task:
         title=obj_in.title,
         description=obj_in.description,
         due_date=obj_in.due_date,
-        completed=obj_in.completed,
-        user_id=obj_in.user_id,
-        family_id=obj_in.family_id
+        status=obj_in.status,
+        family_id=obj_in.family_id,
+        family_member_id=obj_in.family_member_id
     )
     db.add(db_obj)
     db.commit()

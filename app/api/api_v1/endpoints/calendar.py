@@ -1,35 +1,75 @@
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from datetime import datetime
 from app import crud, models, schemas
 from app.api import deps
+from app.crud.crud_calendar import calendar
+from app.schemas.calendar import CalendarEvent, CalendarEventCreate, CalendarEventUpdate
 
 router = APIRouter()
 
-@router.get("/events", response_model=List[schemas.Event])
-def read_events(
+@router.get("/events/", response_model=List[CalendarEvent])
+def get_events(
     db: Session = Depends(deps.get_db),
-    skip: int = 0,
-    limit: int = 100,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    start_date: datetime = Query(...),
+    end_date: datetime = Query(...),
+    family_member_id: Optional[int] = None,
+    event_type: Optional[str] = None
 ):
     """
-    Retrieve events.
+    Retorna eventos do calendário dentro de um período específico.
     """
-    events = crud.event.get_multi_by_user(
-        db=db, user_id=current_user.id, skip=skip, limit=limit
+    return calendar.get_events(
+        db=db,
+        start_date=start_date,
+        end_date=end_date,
+        family_member_id=family_member_id,
+        event_type=event_type
     )
-    return events
 
-@router.post("/events", response_model=schemas.Event)
+@router.post("/events/", response_model=CalendarEvent)
 def create_event(
     *,
     db: Session = Depends(deps.get_db),
-    event_in: schemas.EventCreate,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    event_in: CalendarEventCreate
 ):
     """
-    Create new event.
+    Cria um novo evento no calendário.
     """
-    event = crud.event.create_with_user(db=db, obj_in=event_in, user_id=current_user.id)
-    return event 
+    try:
+        return calendar.create_event(db=db, obj_in=event_in)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao criar evento: {str(e)}"
+        )
+
+@router.put("/events/{event_id}", response_model=CalendarEvent)
+def update_event(
+    *,
+    db: Session = Depends(deps.get_db),
+    event_id: int,
+    event_in: CalendarEventUpdate
+):
+    """
+    Atualiza um evento existente.
+    """
+    event = calendar.get(db=db, id=event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Evento não encontrado")
+    return calendar.update_event(db=db, db_obj=event, obj_in=event_in)
+
+@router.delete("/events/{event_id}")
+def delete_event(
+    *,
+    db: Session = Depends(deps.get_db),
+    event_id: int
+):
+    """
+    Remove um evento do calendário.
+    """
+    event = calendar.get(db=db, id=event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Evento não encontrado")
+    return calendar.remove(db=db, id=event_id) 

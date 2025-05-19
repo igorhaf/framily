@@ -23,6 +23,9 @@
                                 Carregando...
                             </div>
                         </dd>
+                        <dd class="mt-3">
+                            <ul id="nextEventsList" class="text-sm text-gray-700 space-y-1"></ul>
+                        </dd>
                     </dl>
                 </div>
             </div>
@@ -122,7 +125,7 @@
             const tasks = await response.json();
             
             // Atualiza o contador de tarefas pendentes
-            const pendingTasks = tasks.filter(task => !task.completed);
+            const pendingTasks = tasks.filter(task => task.status !== 'completed');
             document.getElementById('pendingTasksCount').textContent = pendingTasks.length;
             
             // Atualiza a lista de atividades recentes
@@ -138,10 +141,10 @@
                         <div class="px-4 py-4 sm:px-6">
                             <div class="flex items-center justify-between">
                                 <p class="text-sm font-medium text-indigo-600 truncate">
-                                    ${task.completed ? 'Tarefa concluída' : 'Nova tarefa'}
+                                    ${task.status === 'completed' ? 'Tarefa concluída' : 'Nova tarefa'}
                                 </p>
                                 <div class="ml-2 flex-shrink-0 flex">
-                                    <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${task.completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                                    <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${task.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
                                         Tarefa
                                     </p>
                                 </div>
@@ -204,10 +207,45 @@
         }
     }
 
+    // Função para carregar próximos eventos
+    async function loadEvents() {
+        try {
+            const start = new Date();
+            const end = new Date();
+            end.setDate(end.getDate() + 30);
+
+            const url = `/api/v1/calendar/events/?start_date=${start.toISOString()}&end_date=${end.toISOString()}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`Erro HTTP! status: ${res.status}`);
+            const events = await res.json();
+
+            // Ordena por data de início
+            events.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+
+            document.getElementById('eventCount').textContent = events.length;
+
+            const nextList = document.getElementById('nextEventsList');
+            if (events.length === 0) {
+                nextList.innerHTML = '<li>Nenhum evento nos próximos 30 dias</li>';
+                return;
+            }
+
+            nextList.innerHTML = events.slice(0, 3).map(ev => {
+                const data = new Date(ev.start_date).toLocaleDateString();
+                return `<li class="flex justify-between"><span>${ev.title}</span><span class="text-gray-500">${data}</span></li>`;
+            }).join('');
+        } catch (err) {
+            console.error('Erro ao carregar eventos:', err);
+            document.getElementById('eventCount').textContent = 'Erro';
+            document.getElementById('nextEventsList').innerHTML = '<li class="text-red-500">Erro ao carregar eventos</li>';
+        }
+    }
+
     // Carrega os dados quando a página carregar
     document.addEventListener('DOMContentLoaded', () => {
         loadTasks();
         loadMonthlyBudget();
+        loadEvents();
     });
 </script>
 {% endblock %} 

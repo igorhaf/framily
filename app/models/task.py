@@ -11,7 +11,7 @@ class Task(Base):
     title = Column(String, index=True)
     description = Column(String, nullable=True)
     due_date = Column(DateTime, nullable=True)
-    completed = Column(Boolean, default=False)
+    status = Column(String, default="pending")
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

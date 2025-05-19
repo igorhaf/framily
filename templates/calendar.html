@@ -1,53 +1,281 @@
 {% extends "base.html" %}
 
-{% block title %}Calendar{% endblock %}
+{% block title %}Calendário{% endblock %}
 
 {% block content %}
-<div class="bg-white shadow overflow-hidden sm:rounded-lg">
-    <div class="px-4 py-5 sm:px-6">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">Calendar</h3>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">Family events and schedules.</p>
+<div class="container mx-auto px-4 py-8">
+    <!-- Barra de Ferramentas -->
+    <div class="flex justify-between items-center mb-6">
+        <div class="flex space-x-4">
+            <button id="today-btn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                Hoje
+            </button>
+            <div class="flex space-x-2">
+                <button id="month-view" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Mês</button>
+                <button id="week-view" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Semana</button>
+                <button id="day-view" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Dia</button>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="flex space-x-2">
+                <button id="prev-btn" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <h2 id="current-date" class="text-xl font-semibold">Maio 2024</h2>
+                <button id="next-btn" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+            <button id="new-event-btn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                Novo Evento
+            </button>
+        </div>
     </div>
-    <div class="border-t border-gray-200">
-        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <div class="text-sm font-medium text-gray-500">Upcoming Events</div>
-            <div class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                <ul role="list" class="divide-y divide-gray-200">
-                    <!-- Events will be loaded dynamically via JavaScript -->
-                    <li class="py-4">Loading events...</li>
-                </ul>
+
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <div class="flex space-x-4">
+            <select id="member-filter" class="form-select">
+                <option value="">Todos os Membros</option>
+                <!-- Membros da família serão carregados via JavaScript -->
+            </select>
+            <select id="type-filter" class="form-select">
+                <option value="">Todos os Tipos</option>
+                <option value="consulta">Consultas</option>
+                <option value="tarefa">Tarefas</option>
+                <option value="evento">Eventos</option>
+                <option value="lembrete">Lembretes</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Calendário Principal -->
+    <div id="calendar" class="bg-white rounded-lg shadow">
+        <!-- Cabeçalho dos dias -->
+        <div class="grid grid-cols-7 gap-px bg-gray-200">
+            <div class="text-center font-semibold p-2 bg-white">Dom</div>
+            <div class="text-center font-semibold p-2 bg-white">Seg</div>
+            <div class="text-center font-semibold p-2 bg-white">Ter</div>
+            <div class="text-center font-semibold p-2 bg-white">Qua</div>
+            <div class="text-center font-semibold p-2 bg-white">Qui</div>
+            <div class="text-center font-semibold p-2 bg-white">Sex</div>
+            <div class="text-center font-semibold p-2 bg-white">Sáb</div>
+        </div>
+        
+        <!-- Grid do calendário -->
+        <div id="calendar-grid" class="grid grid-cols-7 gap-px bg-gray-200">
+            <!-- Dias serão preenchidos via JavaScript -->
+        </div>
+    </div>
+
+    <!-- Modal de Evento -->
+    <div id="event-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Novo Evento</h3>
+                <form id="event-form">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="event-title">
+                            Título
+                        </label>
+                        <input type="text" id="event-title" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="event-description">
+                            Descrição
+                        </label>
+                        <textarea id="event-description" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="event-start">
+                                Início
+                            </label>
+                            <input type="datetime-local" id="event-start" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="event-end">
+                                Fim
+                            </label>
+                            <input type="datetime-local" id="event-end" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="event-type">
+                            Tipo
+                        </label>
+                        <select id="event-type" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <option value="consulta">Consulta</option>
+                            <option value="tarefa">Tarefa</option>
+                            <option value="evento">Evento</option>
+                            <option value="lembrete">Lembrete</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" id="cancel-event" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            Salvar
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-    // Fetch events from the API
+    // Variáveis globais
+    let currentDate = new Date();
+    let currentView = 'month';
+    let events = [];
+
+    // Funções auxiliares
+    function formatDate(date) {
+        return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    }
+
+    function updateCalendarHeader() {
+        document.getElementById('current-date').textContent = formatDate(currentDate);
+    }
+
+    // Carregar eventos
     async function loadEvents() {
         try {
-            const response = await fetch('/api/v1/calendar/events');
-            const events = await response.json();
+            const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
             
-            const eventsList = document.querySelector('ul');
-            eventsList.innerHTML = events.map(event => `
-                <li class="py-4">
-                    <div class="flex space-x-3">
-                        <div class="flex-1 space-y-1">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-medium">${event.title}</h3>
-                                <p class="text-sm text-gray-500">${new Date(event.start_time).toLocaleDateString()}</p>
-                            </div>
-                            <p class="text-sm text-gray-500">${event.description || 'No description'}</p>
-                        </div>
-                    </div>
-                </li>
-            `).join('');
+            const response = await fetch(`/api/v1/calendar/events/?start_date=${startDate.toISOString()}&end_date=${endDate.toISOString()}`);
+            if (!response.ok) throw new Error('Erro ao carregar eventos');
+            
+            events = await response.json();
+            renderCalendar();
         } catch (error) {
-            console.error('Error loading events:', error);
+            console.error('Erro:', error);
         }
     }
 
-    // Load events when the page loads
-    document.addEventListener('DOMContentLoaded', loadEvents);
+    // Renderizar calendário
+    function renderCalendar() {
+        const grid = document.getElementById('calendar-grid');
+        grid.innerHTML = '';
+
+        const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        
+        // Preencher dias vazios no início
+        for (let i = 0; i < firstDay.getDay(); i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'min-h-[100px] p-2 bg-white';
+            grid.appendChild(emptyDay);
+        }
+
+        // Preencher dias do mês
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'min-h-[100px] p-2 bg-white';
+            
+            const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            const dayEvents = events.filter(event => {
+                const eventDate = new Date(event.start_date);
+                return eventDate.getDate() === day;
+            });
+
+            dayElement.innerHTML = `
+                <div class="text-sm text-gray-500">${day}</div>
+                <div class="event-list space-y-1">
+                    ${dayEvents.map(event => `
+                        <div class="text-xs p-1 rounded ${getEventColor(event.event_type)}">
+                            ${event.title}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            grid.appendChild(dayElement);
+        }
+    }
+
+    function getEventColor(eventType) {
+        const colors = {
+            consulta: 'bg-blue-100 text-blue-800',
+            tarefa: 'bg-green-100 text-green-800',
+            evento: 'bg-purple-100 text-purple-800',
+            lembrete: 'bg-yellow-100 text-yellow-800'
+        };
+        return colors[eventType] || 'bg-gray-100 text-gray-800';
+    }
+
+    // Event Listeners
+    document.getElementById('today-btn').addEventListener('click', () => {
+        currentDate = new Date();
+        updateCalendarHeader();
+        loadEvents();
+    });
+
+    document.getElementById('prev-btn').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        updateCalendarHeader();
+        loadEvents();
+    });
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        updateCalendarHeader();
+        loadEvents();
+    });
+
+    document.getElementById('new-event-btn').addEventListener('click', () => {
+        document.getElementById('event-modal').classList.remove('hidden');
+    });
+
+    document.getElementById('cancel-event').addEventListener('click', () => {
+        document.getElementById('event-modal').classList.add('hidden');
+    });
+
+    document.getElementById('event-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const eventData = {
+            title: document.getElementById('event-title').value,
+            description: document.getElementById('event-description').value,
+            start_date: document.getElementById('event-start').value,
+            end_date: document.getElementById('event-end').value,
+            event_type: document.getElementById('event-type').value,
+            family_member_id: 1, // TODO: Implementar seleção de membro
+            is_all_day: false
+        };
+
+        try {
+            const response = await fetch('/api/v1/calendar/events/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(eventData)
+            });
+
+            if (!response.ok) throw new Error('Erro ao criar evento');
+
+            document.getElementById('event-modal').classList.add('hidden');
+            document.getElementById('event-form').reset();
+            loadEvents();
+        } catch (error) {
+            console.error('Erro:', error);
+        }
+    });
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+        updateCalendarHeader();
+        loadEvents();
+    });
 </script>
 {% endblock %} 
