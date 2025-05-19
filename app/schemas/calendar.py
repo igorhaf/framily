@@ -8,7 +8,7 @@ class CalendarEventBase(BaseModel):
     start_date: datetime
     end_date: datetime
     event_type: str  # Mudando para str para corresponder ao modelo
-    family_member_id: int
+    family_member_id: Optional[int] = None  # Tornando opcional para corresponder ao modelo na tabela
     location: Optional[str] = None
     is_all_day: bool = False
     color: Optional[str] = None

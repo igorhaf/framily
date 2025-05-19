@@ -213,11 +213,33 @@
             const start = new Date();
             const end = new Date();
             end.setDate(end.getDate() + 30);
-
-            const url = `/api/v1/calendar/events/?start_date=${start.toISOString()}&end_date=${end.toISOString()}`;
+            
+            // Formatar data no formato YYYY-MM-DD
+            function formatDate(date) {
+                return date.getFullYear() + '-' + 
+                    String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(date.getDate()).padStart(2, '0');
+            }
+            
+            // Usar formato de data simples sem hora para evitar problemas de timezone
+            const url = `/api/v1/calendar/events/?start_date=${formatDate(start)}&end_date=${formatDate(end)}`;
+            console.log('Buscando eventos na URL:', url);
+            
             const res = await fetch(url);
-            if (!res.ok) throw new Error(`Erro HTTP! status: ${res.status}`);
+            
+            if (!res.ok) {
+                console.error('Erro na resposta:', res.status, res.statusText);
+                throw new Error(`Erro HTTP! status: ${res.status}`);
+            }
+            
             const events = await res.json();
+            console.log('Eventos recebidos:', events);
+            
+            // Verificação de segurança para eventos
+            if (!Array.isArray(events)) {
+                console.error('A resposta não é um array:', events);
+                throw new Error('Formato de resposta inválido');
+            }
 
             // Ordena por data de início
             events.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
@@ -230,10 +252,35 @@
                 return;
             }
 
-            nextList.innerHTML = events.slice(0, 3).map(ev => {
-                const data = new Date(ev.start_date).toLocaleDateString();
-                return `<li class="flex justify-between"><span>${ev.title}</span><span class="text-gray-500">${data}</span></li>`;
-            }).join('');
+            nextList.innerHTML = '';
+            // Criar cada elemento da lista individualmente para evitar problemas
+            events.slice(0, 3).forEach(ev => {
+                try {
+                    const li = document.createElement('li');
+                    li.className = 'flex justify-between';
+                    
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = ev.title;
+                    
+                    const dateSpan = document.createElement('span');
+                    dateSpan.className = 'text-gray-500';
+                    
+                    // Usar try-catch para lidar com datas inválidas
+                    try {
+                        const eventDate = new Date(ev.start_date);
+                        dateSpan.textContent = eventDate.toLocaleDateString();
+                    } catch(dateError) {
+                        console.error('Erro ao formatar data:', dateError);
+                        dateSpan.textContent = 'Data desconhecida';
+                    }
+                    
+                    li.appendChild(titleSpan);
+                    li.appendChild(dateSpan);
+                    nextList.appendChild(li);
+                } catch(itemError) {
+                    console.error('Erro ao processar evento:', itemError, ev);
+                }
+            });
         } catch (err) {
             console.error('Erro ao carregar eventos:', err);
             document.getElementById('eventCount').textContent = 'Erro';

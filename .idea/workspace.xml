@@ -6,20 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="3eb0fcfe-8f57-41b5-bc74-42454b02eeb0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/alembic/versions/20250519_1554_39c10d608233_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/alembic/versions/20250519_1554_4a11eb8f0d57_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/alembic/versions/create_tasks_table.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/alembic/versions/remove_health_records.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/api_v1/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/api_v1/api.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/api/api_v1/endpoints/calendar.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/api_v1/endpoints/calendar.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/crud/crud_task.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/crud/crud_task.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/db/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/db/base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/health.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/health.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/task.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/task.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas/task.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/task.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/check_family_members.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/check_family_members.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/calendar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/calendar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/tasks.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tasks.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/crud/crud_calendar.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/crud/crud_calendar.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

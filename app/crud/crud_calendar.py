@@ -16,8 +16,8 @@ class CRUDCalendar(CRUDBase[CalendarEvent, CalendarEventCreate, CalendarEventUpd
         event_type: Optional[str] = None
     ) -> List[CalendarEvent]:
         query = db.query(self.model).filter(
-            self.model.start_date >= start_date,
-            self.model.end_date <= end_date
+            self.model.start_date <= end_date,
+            self.model.end_date >= start_date
         )
         
         if family_member_id:
