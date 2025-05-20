@@ -4,126 +4,80 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <!-- Barra de Ferramentas -->
-    <div class="flex justify-between items-center mb-6">
-        <div class="flex space-x-4">
-            <button id="today-btn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                Hoje
-            </button>
-            <div class="flex space-x-2">
-                <button id="month-view" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Mês</button>
-                <button id="week-view" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Semana</button>
-                <button id="day-view" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Dia</button>
-            </div>
-        </div>
-        <div class="flex items-center space-x-4">
-            <div class="flex space-x-2">
-                <button id="prev-btn" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                </button>
-                <h2 id="current-date" class="text-xl font-semibold">Maio 2024</h2>
-                <button id="next-btn" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                    </svg>
-                </button>
-            </div>
-            <button id="new-event-btn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                Novo Evento
-            </button>
-        </div>
+    <!-- Loading Indicator -->
+    <div id="loading" class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
     </div>
 
-    <!-- Filtros -->
-    <div class="bg-white rounded-lg shadow p-4 mb-6">
-        <div class="flex space-x-4">
-            <select id="member-filter" class="form-select">
-                <option value="">Todos os Membros</option>
-                <!-- Membros da família serão carregados via JavaScript -->
-            </select>
-            <select id="type-filter" class="form-select">
-                <option value="">Todos os Tipos</option>
-                <option value="consulta">Consultas</option>
-                <option value="tarefa">Tarefas</option>
-                <option value="evento">Eventos</option>
-                <option value="lembrete">Lembretes</option>
-            </select>
-        </div>
+    <!-- Error Message -->
+    <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <span class="block sm:inline"></span>
     </div>
 
-    <!-- Calendário Principal -->
-    <div id="calendar" class="bg-white rounded-lg shadow">
-        <!-- Cabeçalho dos dias -->
-        <div class="grid grid-cols-7 gap-px bg-gray-200">
-            <div class="text-center font-semibold p-2 bg-white">Dom</div>
-            <div class="text-center font-semibold p-2 bg-white">Seg</div>
-            <div class="text-center font-semibold p-2 bg-white">Ter</div>
-            <div class="text-center font-semibold p-2 bg-white">Qua</div>
-            <div class="text-center font-semibold p-2 bg-white">Qui</div>
-            <div class="text-center font-semibold p-2 bg-white">Sex</div>
-            <div class="text-center font-semibold p-2 bg-white">Sáb</div>
-        </div>
-        
-        <!-- Grid do calendário -->
-        <div id="calendar-grid" class="grid grid-cols-7 gap-px bg-gray-200">
-            <!-- Dias serão preenchidos via JavaScript -->
-        </div>
-    </div>
-
-    <!-- Modal de Evento -->
-    <div id="event-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Novo Evento</h3>
-                <form id="event-form">
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="event-title">
-                            Título
-                        </label>
-                        <input type="text" id="event-title" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="event-description">
-                            Descrição
-                        </label>
-                        <textarea id="event-description" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="event-start">
-                                Início
-                            </label>
-                            <input type="datetime-local" id="event-start" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="event-end">
-                                Fim
-                            </label>
-                            <input type="datetime-local" id="event-end" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="event-type">
-                            Tipo
-                        </label>
-                        <select id="event-type" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                            <option value="consulta">Consulta</option>
-                            <option value="tarefa">Tarefa</option>
-                            <option value="evento">Evento</option>
-                            <option value="lembrete">Lembrete</option>
-                        </select>
-                    </div>
-                    <div class="flex justify-end space-x-2">
-                        <button type="button" id="cancel-event" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-                            Cancelar
+    <!-- Dashboard Content -->
+    <div id="dashboard-content" class="hidden">
+        <!-- Calendário -->
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-900">Calendário de Eventos</h3>
+                    <div class="flex space-x-2">
+                        <button id="prevMonth" class="p-2 rounded-full hover:bg-gray-100">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
                         </button>
-                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                            Salvar
+                        <button id="nextMonth" class="p-2 rounded-full hover:bg-gray-100">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
                         </button>
                     </div>
-                </form>
+                </div>
+            </div>
+            <div class="p-6">
+                <div id="calendar" class="grid grid-cols-7 gap-2">
+                    <!-- Dias da semana -->
+                    <div class="text-center font-medium text-gray-500">Dom</div>
+                    <div class="text-center font-medium text-gray-500">Seg</div>
+                    <div class="text-center font-medium text-gray-500">Ter</div>
+                    <div class="text-center font-medium text-gray-500">Qua</div>
+                    <div class="text-center font-medium text-gray-500">Qui</div>
+                    <div class="text-center font-medium text-gray-500">Sex</div>
+                    <div class="text-center font-medium text-gray-500">Sáb</div>
+                    <!-- Dias do mês serão inseridos via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Legenda -->
+        <div class="bg-white rounded-lg shadow p-4 mb-8">
+            <h4 class="text-sm font-medium text-gray-900 mb-3">Legenda</h4>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-blue-50 rounded mr-2"></div>
+                    <span class="text-sm text-gray-600">Eventos</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-red-50 rounded mr-2"></div>
+                    <span class="text-sm text-gray-600">Eventos Importantes</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-green-50 rounded mr-2"></div>
+                    <span class="text-sm text-gray-600">Eventos Recorrentes</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Eventos do Dia Selecionado -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Eventos do Dia</h3>
+            </div>
+            <div class="p-6">
+                <div id="selectedDayEvents" class="space-y-4">
+                    <div class="text-center text-gray-500">Selecione um dia no calendário para ver os eventos</div>
+                </div>
             </div>
         </div>
     </div>
@@ -132,150 +86,260 @@
 
 {% block scripts %}
 <script>
-    // Variáveis globais
+    function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        const errorMessage = errorDiv.querySelector('span');
+        errorMessage.textContent = message;
+        errorDiv.classList.remove('hidden');
+    }
+
+    // Função para formatar a data
+    function formatDate(dateString) {
+        if (!dateString) return 'Sem data';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR');
+    }
+
+    // Função para formatar a hora
+    function formatTime(timeString) {
+        if (!timeString) return '';
+        return timeString.substring(0, 5);
+    }
+
+    // Variáveis globais para o calendário
     let currentDate = new Date();
-    let currentView = 'month';
     let events = [];
+    let selectedDate = null;
 
-    // Funções auxiliares
-    function formatDate(date) {
-        return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    // Função para gerar o calendário
+    function generateCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        // Primeiro dia do mês
+        const firstDay = new Date(year, month, 1);
+        // Último dia do mês
+        const lastDay = new Date(year, month + 1, 0);
+        
+        // Dia da semana do primeiro dia (0 = Domingo, 6 = Sábado)
+        const firstDayOfWeek = firstDay.getDay();
+        
+        // Número total de dias no mês
+        const totalDays = lastDay.getDate();
+        
+        // Array para armazenar os dias do calendário
+        const calendarDays = [];
+        
+        // Adiciona espaços vazios para os dias antes do primeiro dia do mês
+        for (let i = 0; i < firstDayOfWeek; i++) {
+            calendarDays.push('<div class="h-24"></div>');
+        }
+        
+        // Adiciona os dias do mês
+        for (let day = 1; day <= totalDays; day++) {
+            const date = new Date(year, month, day);
+            const dateString = date.toISOString().split('T')[0];
+            
+            // Filtra os eventos para este dia
+            const dayEvents = events.filter(event => {
+                if (!event.start_date) return false;
+                const eventDate = new Date(event.start_date).toISOString().split('T')[0];
+                return eventDate === dateString;
+            });
+            
+            // Determina a cor de fundo baseada no tipo de evento
+            let bgColor = 'bg-white';
+            if (dayEvents.length > 0) {
+                if (dayEvents.some(event => event.event_type === 'recurring')) {
+                    bgColor = 'bg-green-50';
+                } else if (dayEvents.some(event => event.event_type === 'important')) {
+                    bgColor = 'bg-red-50';
+                } else {
+                    bgColor = 'bg-blue-50';
+                }
+            }
+            
+            // Marca o dia atual e o dia selecionado
+            const isToday = date.toDateString() === new Date().toDateString();
+            const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
+            const todayClass = isToday ? 'ring-2 ring-blue-500' : '';
+            const selectedClass = isSelected ? 'ring-2 ring-purple-500' : '';
+            
+            calendarDays.push(`
+                <div class="h-24 p-2 ${bgColor} ${todayClass} ${selectedClass} rounded-lg relative cursor-pointer hover:bg-gray-50"
+                     onclick="selectDate('${dateString}')">
+                    <span class="text-sm font-medium">${day}</span>
+                    ${dayEvents.length > 0 ? `
+                        <div class="mt-1">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                dayEvents.some(event => event.event_type === 'recurring') ? 'bg-green-100 text-green-800' :
+                                dayEvents.some(event => event.event_type === 'important') ? 'bg-red-100 text-red-800' :
+                                'bg-blue-100 text-blue-800'
+                            }">
+                                ${dayEvents.length} evento${dayEvents.length > 1 ? 's' : ''}
+                            </span>
+                        </div>
+                    ` : ''}
+                </div>
+            `);
+        }
+        
+        // Atualiza o calendário
+        const calendarContainer = document.getElementById('calendar');
+        calendarContainer.innerHTML = `
+            <div class="text-center font-medium text-gray-500">Dom</div>
+            <div class="text-center font-medium text-gray-500">Seg</div>
+            <div class="text-center font-medium text-gray-500">Ter</div>
+            <div class="text-center font-medium text-gray-500">Qua</div>
+            <div class="text-center font-medium text-gray-500">Qui</div>
+            <div class="text-center font-medium text-gray-500">Sex</div>
+            <div class="text-center font-medium text-gray-500">Sáb</div>
+            ${calendarDays.join('')}
+        `;
+        
+        // Atualiza o título do mês
+        const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                          'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        const calendarHeader = document.querySelector('#calendar').closest('.bg-white').querySelector('h3');
+        if (calendarHeader) {
+            calendarHeader.textContent = `Calendário de Eventos - ${monthNames[month]} ${year}`;
+        }
     }
 
-    function updateCalendarHeader() {
-        document.getElementById('current-date').textContent = formatDate(currentDate);
+    // Função para selecionar uma data
+    function selectDate(dateString) {
+        selectedDate = new Date(dateString);
+        const dayEvents = events.filter(event => {
+            if (!event.start_date) return false;
+            const eventDate = new Date(event.start_date).toISOString().split('T')[0];
+            return eventDate === dateString;
+        });
+
+        const selectedDayEvents = document.getElementById('selectedDayEvents');
+        
+        if (dayEvents.length === 0) {
+            selectedDayEvents.innerHTML = '<div class="text-center text-gray-500">Nenhum evento para este dia</div>';
+            return;
+        }
+
+        selectedDayEvents.innerHTML = dayEvents.map(event => `
+            <div class="bg-white rounded-lg p-4 border ${
+                event.event_type === 'recurring' ? 'border-green-200' :
+                event.event_type === 'important' ? 'border-red-200' :
+                'border-blue-200'
+            }">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-sm font-medium ${
+                        event.event_type === 'recurring' ? 'text-green-900' :
+                        event.event_type === 'important' ? 'text-red-900' :
+                        'text-blue-900'
+                    }">${event.title}</h4>
+                    <span class="text-sm ${
+                        event.event_type === 'recurring' ? 'text-green-600' :
+                        event.event_type === 'important' ? 'text-red-600' :
+                        'text-blue-600'
+                    }">${formatTime(event.start_date)}</span>
+                </div>
+                ${event.description ? `
+                    <p class="text-sm ${
+                        event.event_type === 'recurring' ? 'text-green-700' :
+                        event.event_type === 'important' ? 'text-red-700' :
+                        'text-blue-700'
+                    } mb-2">${event.description}</p>
+                ` : ''}
+                <div class="flex justify-between items-center">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        event.event_type === 'recurring' ? 'bg-green-100 text-green-800' :
+                        event.event_type === 'important' ? 'bg-red-100 text-red-800' :
+                        'bg-blue-100 text-blue-800'
+                    }">
+                        ${event.event_type === 'recurring' ? 'Recorrente' :
+                          event.event_type === 'important' ? 'Importante' :
+                          event.event_type || 'Evento'}
+                    </span>
+                    ${event.location ? `
+                        <span class="text-sm text-gray-600">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            ${event.location}
+                        </span>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
+
+        // Atualiza o calendário para mostrar a seleção
+        generateCalendar();
     }
 
-    // Carregar eventos
+    // Função para carregar os eventos
     async function loadEvents() {
         try {
-            const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-            const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-            
-            const response = await fetch(`/api/v1/calendar/events/?start_date=${startDate.toISOString()}&end_date=${endDate.toISOString()}`);
-            if (!response.ok) throw new Error('Erro ao carregar eventos');
-            
+            // Calcular datas para o mês atual
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const start = new Date(year, month, 1);
+            const end = new Date(year, month + 1, 0);
+
+            // Formatar datas no formato YYYY-MM-DD
+            function formatDate(date) {
+                return date.getFullYear() + '-' + 
+                    String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(date.getDate()).padStart(2, '0');
+            }
+
+            const url = `/api/v1/calendar/events/?start_date=${formatDate(start)}&end_date=${formatDate(end)}`;
+            console.log('Buscando eventos na URL:', url);
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Erro HTTP! status: ${response.status}`);
+            }
             events = await response.json();
-            renderCalendar();
-        } catch (error) {
-            console.error('Erro:', error);
-        }
-    }
-
-    // Renderizar calendário
-    function renderCalendar() {
-        const grid = document.getElementById('calendar-grid');
-        grid.innerHTML = '';
-
-        const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-        
-        // Preencher dias vazios no início
-        for (let i = 0; i < firstDay.getDay(); i++) {
-            const emptyDay = document.createElement('div');
-            emptyDay.className = 'min-h-[100px] p-2 bg-white';
-            grid.appendChild(emptyDay);
-        }
-
-        // Preencher dias do mês
-        for (let day = 1; day <= lastDay.getDate(); day++) {
-            const dayElement = document.createElement('div');
-            dayElement.className = 'min-h-[100px] p-2 bg-white';
             
-            const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-            const dayEvents = events.filter(event => {
-                const eventDate = new Date(event.start_date);
-                return eventDate.getDate() === day;
-            });
+            if (!Array.isArray(events)) {
+                throw new Error('Esperava que os eventos fossem um array');
+            }
 
-            dayElement.innerHTML = `
-                <div class="text-sm text-gray-500">${day}</div>
-                <div class="event-list space-y-1">
-                    ${dayEvents.map(event => `
-                        <div class="text-xs p-1 rounded ${getEventColor(event.event_type)}">
-                            ${event.title}
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-
-            grid.appendChild(dayElement);
-        }
-    }
-
-    function getEventColor(eventType) {
-        const colors = {
-            consulta: 'bg-blue-100 text-blue-800',
-            tarefa: 'bg-green-100 text-green-800',
-            evento: 'bg-purple-100 text-purple-800',
-            lembrete: 'bg-yellow-100 text-yellow-800'
-        };
-        return colors[eventType] || 'bg-gray-100 text-gray-800';
-    }
-
-    // Event Listeners
-    document.getElementById('today-btn').addEventListener('click', () => {
-        currentDate = new Date();
-        updateCalendarHeader();
-        loadEvents();
-    });
-
-    document.getElementById('prev-btn').addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-        updateCalendarHeader();
-        loadEvents();
-    });
-
-    document.getElementById('next-btn').addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        updateCalendarHeader();
-        loadEvents();
-    });
-
-    document.getElementById('new-event-btn').addEventListener('click', () => {
-        document.getElementById('event-modal').classList.remove('hidden');
-    });
-
-    document.getElementById('cancel-event').addEventListener('click', () => {
-        document.getElementById('event-modal').classList.add('hidden');
-    });
-
-    document.getElementById('event-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const eventData = {
-            title: document.getElementById('event-title').value,
-            description: document.getElementById('event-description').value,
-            start_date: document.getElementById('event-start').value,
-            end_date: document.getElementById('event-end').value,
-            event_type: document.getElementById('event-type').value,
-            family_member_id: 1, // TODO: Implementar seleção de membro
-            is_all_day: false
-        };
-
-        try {
-            const response = await fetch('/api/v1/calendar/events/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(eventData)
-            });
-
-            if (!response.ok) throw new Error('Erro ao criar evento');
-
-            document.getElementById('event-modal').classList.add('hidden');
-            document.getElementById('event-form').reset();
-            loadEvents();
+            // Gera o calendário
+            generateCalendar();
+            
         } catch (error) {
-            console.error('Erro:', error);
+            console.error('Erro ao carregar eventos:', error);
+            showError(`Erro ao carregar eventos: ${error.message}`);
         }
-    });
+    }
 
-    // Inicialização
-    document.addEventListener('DOMContentLoaded', () => {
-        updateCalendarHeader();
-        loadEvents();
-    });
+    // Função para inicializar a página
+    async function initializePage() {
+        try {
+            await loadEvents();
+            
+            // Esconde o loading e mostra o conteúdo
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('dashboard-content').classList.remove('hidden');
+            
+            // Adiciona eventos para navegação do calendário
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                generateCalendar();
+            });
+            
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                generateCalendar();
+            });
+            
+        } catch (error) {
+            console.error('Erro ao inicializar página:', error);
+            showError(`Erro ao carregar dados: ${error.message}`);
+            document.getElementById('loading').classList.add('hidden');
+        }
+    }
+
+    // Inicializa a página quando o DOM estiver carregado
+    document.addEventListener('DOMContentLoaded', initializePage);
 </script>
 {% endblock %} 

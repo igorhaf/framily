@@ -3,25 +3,128 @@
 {% block title %}Tarefas{% endblock %}
 
 {% block content %}
-<div class="bg-white shadow overflow-hidden sm:rounded-lg">
-    <div class="px-4 py-5 sm:px-6">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">Tarefas</h3>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">Tarefas e afazeres da família.</p>
+<div class="container mx-auto px-4 py-8">
+    <!-- Loading Indicator -->
+    <div id="loading" class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
     </div>
-    <div class="border-t border-gray-200">
-        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <div class="text-sm font-medium text-gray-500">Tarefas Atuais</div>
-            <div class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                <ul role="list" class="divide-y divide-gray-200">
-                    <!-- Tarefas serão carregadas dinamicamente via JavaScript -->
-                    <li class="py-4">Carregando tarefas...</li>
-                </ul>
+
+    <!-- Error Message -->
+    <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <span class="block sm:inline"></span>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div id="dashboard-content" class="hidden">
+        <!-- Estatísticas Rápidas -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Total de Tarefas -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500">Total de Tarefas</h3>
+                        <p id="totalTasks" class="text-2xl font-semibold text-gray-900">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarefas Pendentes -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500">Pendentes</h3>
+                        <p id="pendingTasks" class="text-2xl font-semibold text-gray-900">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Em Progresso -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500">Em Progresso</h3>
+                        <p id="inProgressTasks" class="text-2xl font-semibold text-gray-900">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Concluídas -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500">Concluídas</h3>
+                        <p id="completedTasks" class="text-2xl font-semibold text-gray-900">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Tarefas Pendentes -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Tarefas Pendentes</h3>
+                </div>
+                <div class="p-6">
+                    <div id="pendingTasksList" class="space-y-4">
+                        <div class="text-center text-gray-500">Carregando tarefas...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarefas em Progresso -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Em Progresso</h3>
+                </div>
+                <div class="p-6">
+                    <div id="inProgressTasksList" class="space-y-4">
+                        <div class="text-center text-gray-500">Carregando tarefas...</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
+    function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        const errorMessage = errorDiv.querySelector('span');
+        errorMessage.textContent = message;
+        errorDiv.classList.remove('hidden');
+    }
+
+    // Função para formatar a data
+    function formatDate(dateString) {
+        if (!dateString) return 'Sem data de vencimento';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR');
+    }
+
     // Função para carregar as tarefas
     async function loadTasks() {
         try {
@@ -31,42 +134,120 @@
             }
             const tasks = await response.json();
             
-            const tasksList = document.querySelector('ul');
             if (!Array.isArray(tasks)) {
                 throw new Error('Esperava que as tarefas fossem um array');
             }
+
+            // Atualiza os contadores
+            const totalTasks = tasks.length;
+            const pendingTasks = tasks.filter(task => task.status === 'pending').length;
+            const inProgressTasks = tasks.filter(task => task.status === 'in_progress').length;
+            const completedTasks = tasks.filter(task => task.status === 'completed').length;
+
+            document.getElementById('totalTasks').textContent = totalTasks;
+            document.getElementById('pendingTasks').textContent = pendingTasks;
+            document.getElementById('inProgressTasks').textContent = inProgressTasks;
+            document.getElementById('completedTasks').textContent = completedTasks;
+
+            // Renderiza as tarefas pendentes
+            const pendingTasksList = document.getElementById('pendingTasksList');
+            const pendingTasksItems = tasks.filter(task => task.status === 'pending');
             
-            if (tasks.length === 0) {
-                tasksList.innerHTML = '<li class="py-4 text-center text-gray-500">Nenhuma tarefa encontrada</li>';
-                return;
-            }
-            
-            tasksList.innerHTML = tasks.map(task => `
-                <li class="py-4">
-                    <div class="flex space-x-3">
-                        <div class="flex-1 space-y-1">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-sm font-medium">${task.title}</h3>
-                                <p class="text-sm text-gray-500">${task.due_date ? new Date(task.due_date).toLocaleDateString() : 'Sem data de vencimento'}</p>
-                            </div>
-                            <p class="text-sm text-gray-500">${task.description || 'Sem descrição'}</p>
-                            <div class="flex items-center">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${task.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
-                                    ${task.status === 'completed' ? 'Concluída' : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-                                </span>
-                            </div>
+            if (pendingTasksItems.length === 0) {
+                pendingTasksList.innerHTML = '<div class="text-center text-gray-500">Nenhuma tarefa pendente</div>';
+            } else {
+                pendingTasksList.innerHTML = pendingTasksItems.map(task => `
+                    <div class="bg-yellow-50 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-sm font-medium text-yellow-900">${task.title}</h4>
+                            <span class="text-sm text-yellow-600">${formatDate(task.due_date)}</span>
+                        </div>
+                        ${task.description ? `
+                            <p class="text-sm text-yellow-700 mb-2">${task.description}</p>
+                        ` : ''}
+                        <div class="flex justify-end">
+                            <button onclick="updateTaskStatus(${task.id}, 'in_progress')" 
+                                    class="text-sm text-yellow-600 hover:text-yellow-700">
+                                Iniciar
+                            </button>
                         </div>
                     </div>
-                </li>
-            `).join('');
+                `).join('');
+            }
+
+            // Renderiza as tarefas em progresso
+            const inProgressTasksList = document.getElementById('inProgressTasksList');
+            const inProgressTasksItems = tasks.filter(task => task.status === 'in_progress');
+            
+            if (inProgressTasksItems.length === 0) {
+                inProgressTasksList.innerHTML = '<div class="text-center text-gray-500">Nenhuma tarefa em progresso</div>';
+            } else {
+                inProgressTasksList.innerHTML = inProgressTasksItems.map(task => `
+                    <div class="bg-purple-50 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-sm font-medium text-purple-900">${task.title}</h4>
+                            <span class="text-sm text-purple-600">${formatDate(task.due_date)}</span>
+                        </div>
+                        ${task.description ? `
+                            <p class="text-sm text-purple-700 mb-2">${task.description}</p>
+                        ` : ''}
+                        <div class="flex justify-end">
+                            <button onclick="updateTaskStatus(${task.id}, 'completed')" 
+                                    class="text-sm text-purple-600 hover:text-purple-700">
+                                Concluir
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
         } catch (error) {
             console.error('Erro ao carregar tarefas:', error);
-            const tasksList = document.querySelector('ul');
-            tasksList.innerHTML = `<li class="py-4 text-red-600">Erro ao carregar tarefas: ${error.message}</li>`;
+            showError(`Erro ao carregar tarefas: ${error.message}`);
         }
     }
 
-    // Carrega as tarefas quando a página carregar
-    document.addEventListener('DOMContentLoaded', loadTasks);
+    // Função para atualizar o status da tarefa
+    async function updateTaskStatus(taskId, newStatus) {
+        try {
+            const response = await fetch(`/api/v1/tasks/${taskId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erro HTTP! status: ${response.status}`);
+            }
+
+            // Recarrega as tarefas após a atualização
+            await loadTasks();
+            
+        } catch (error) {
+            console.error('Erro ao atualizar tarefa:', error);
+            showError(`Erro ao atualizar tarefa: ${error.message}`);
+        }
+    }
+
+    // Função para inicializar a página
+    async function initializePage() {
+        try {
+            await loadTasks();
+            
+            // Esconde o loading e mostra o conteúdo
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('dashboard-content').classList.remove('hidden');
+            
+        } catch (error) {
+            console.error('Erro ao inicializar página:', error);
+            showError(`Erro ao carregar dados: ${error.message}`);
+            document.getElementById('loading').classList.add('hidden');
+        }
+    }
+
+    // Inicializa a página quando o DOM estiver carregado
+    document.addEventListener('DOMContentLoaded', initializePage);
 </script>
 {% endblock %} 
