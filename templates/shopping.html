@@ -39,9 +39,9 @@
                         <div class="flex items-center space-x-3">
                             <input type="checkbox" 
                                    class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
-                                   {% if item.purchased %}checked{% endif %}
+                                   {% if item.status == 'BOUGHT' %}checked{% endif %}
                                    onchange="toggleItemPurchased({{ list.id }}, {{ item.id }}, this.checked)">
-                            <span class="{% if item.purchased %}line-through text-gray-500{% endif %}">
+                            <span class="{% if item.status == 'BOUGHT' %}line-through text-gray-500{% endif %}">
                                 {{ item.name }}
                             </span>
                         </div>
@@ -148,6 +148,12 @@
 
 {% block scripts %}
 <script>
+    // Adicionar event listeners aos formulários
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('createListForm').addEventListener('submit', createList);
+        document.getElementById('addItemForm').addEventListener('submit', addItem);
+    });
+
     // Funções para manipular os modais
     function openCreateListModal() {
         document.getElementById('createListModal').classList.remove('hidden');
@@ -282,9 +288,5 @@
             alert('Erro ao atualizar item');
         }
     }
-
-    // Adicionar event listeners
-    document.getElementById('createListForm').addEventListener('submit', createList);
-    document.getElementById('addItemForm').addEventListener('submit', addItem);
 </script>
 {% endblock %} 
