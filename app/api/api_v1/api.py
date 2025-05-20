@@ -3,7 +3,8 @@ from app.api.api_v1.endpoints import (
     tasks,
     finance,
     health,
-    calendar
+    calendar,
+    whatsapp
 )
 
 api_router = APIRouter()
@@ -24,4 +25,7 @@ api_router.include_router(finance_router, prefix="/finance", tags=["finance"])
 api_router.include_router(health_router, prefix="/health", tags=["health"])
 
 # Calendar management
-api_router.include_router(calendar_router, prefix="/calendar", tags=["calendar"]) 
+api_router.include_router(calendar_router, prefix="/calendar", tags=["calendar"])
+
+# WhatsApp management
+api_router.include_router(whatsapp.router, prefix="/whatsapp", tags=["whatsapp"]) 
