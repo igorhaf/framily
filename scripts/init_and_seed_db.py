@@ -20,6 +20,13 @@ def seed_database():
         # Importa e executa o script de seed de tasks
         from seed_tasks import main as seed_tasks
         seed_tasks()
+        print("✅ Tasks criadas com sucesso!")
+
+        # Importa e executa o script de seed de shopping
+        from seed_shopping_data import main as seed_shopping
+        seed_shopping()
+        print("✅ Listas de compras criadas com sucesso!")
+
         print("✅ Banco de dados populado com sucesso!")
         return True
     except Exception as e:

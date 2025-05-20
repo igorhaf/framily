@@ -3,6 +3,7 @@ from .task import Task
 from .event import Event
 from .finance import FinanceCategory, FinanceTransaction, FinanceBudget
 from .health import HealthAppointment, HealthMedication, HealthExam
+from .shopping import ShoppingList, ShoppingItem, PriorityEnum, StatusEnum, CategoryEnum
 
 __all__ = [
     "Family",
@@ -15,4 +16,9 @@ __all__ = [
     "HealthAppointment",
     "HealthMedication",
     "HealthExam",
+    "ShoppingList",
+    "ShoppingItem",
+    "PriorityEnum",
+    "StatusEnum",
+    "CategoryEnum"
 ] 

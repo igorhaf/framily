@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block title %}Compras{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow rounded-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Listas de Compras</h1>
+        <button onclick="openCreateListModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+            Nova Lista
+        </button>
+    </div>
+
+    <!-- Listas de Compras -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for list in shopping_lists %}
+        <div class="bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow">
+            <div class="p-4">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">{{ list.name }}</h2>
+                    <div class="flex space-x-2">
+                        <button onclick="openAddItemModal({{ list.id }})" class="text-indigo-600 hover:text-indigo-800">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                        </button>
+                        <button onclick="deleteList({{ list.id }})" class="text-red-600 hover:text-red-800">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Items da Lista -->
+                <div class="space-y-2">
+                    {% for item in list.items %}
+                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <div class="flex items-center space-x-3">
+                            <input type="checkbox" 
+                                   class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+                                   {% if item.purchased %}checked{% endif %}
+                                   onchange="toggleItemPurchased({{ list.id }}, {{ item.id }}, this.checked)">
+                            <span class="{% if item.purchased %}line-through text-gray-500{% endif %}">
+                                {{ item.name }}
+                            </span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-500">{{ item.quantity }}</span>
+                            <button onclick="deleteItem({{ list.id }}, {{ item.id }})" class="text-red-600 hover:text-red-800">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal Criar Lista -->
+<div id="createListModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Nova Lista de Compras</h3>
+            <form id="createListForm" class="space-y-4">
+                <div>
+                    <label for="listName" class="block text-sm font-medium text-gray-700">Nome da Lista</label>
+                    <input type="text" id="listName" name="name" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeCreateListModal()"
+                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Criar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Item -->
+<div id="addItemModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Adicionar Item</h3>
+            <form id="addItemForm" class="space-y-4">
+                <input type="hidden" id="listId" name="shopping_list_id">
+                <div>
+                    <label for="itemName" class="block text-sm font-medium text-gray-700">Nome do Item</label>
+                    <input type="text" id="itemName" name="name" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label for="itemQuantity" class="block text-sm font-medium text-gray-700">Quantidade</label>
+                    <input type="number" id="itemQuantity" name="quantity" required min="1"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label for="itemCategory" class="block text-sm font-medium text-gray-700">Categoria</label>
+                    <select id="itemCategory" name="category" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="FOOD">Alimentos</option>
+                        <option value="CLEANING">Limpeza</option>
+                        <option value="HYGIENE">Higiene</option>
+                        <option value="HOUSEHOLD">Casa</option>
+                        <option value="OTHER">Outros</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="itemPriority" class="block text-sm font-medium text-gray-700">Prioridade</label>
+                    <select id="itemPriority" name="priority" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="LOW">Baixa</option>
+                        <option value="MEDIUM">Média</option>
+                        <option value="HIGH">Alta</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="itemNotes" class="block text-sm font-medium text-gray-700">Observações</label>
+                    <textarea id="itemNotes" name="notes" rows="2"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeAddItemModal()"
+                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Adicionar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Funções para manipular os modais
+    function openCreateListModal() {
+        document.getElementById('createListModal').classList.remove('hidden');
+    }
+
+    function closeCreateListModal() {
+        document.getElementById('createListModal').classList.add('hidden');
+    }
+
+    function openAddItemModal(listId) {
+        document.getElementById('listId').value = listId;
+        document.getElementById('addItemModal').classList.remove('hidden');
+    }
+
+    function closeAddItemModal() {
+        document.getElementById('addItemModal').classList.add('hidden');
+    }
+
+    // Funções para manipular as listas e itens
+    async function createList(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = {
+            name: formData.get('name')
+        };
+
+        try {
+            const response = await fetch('/api/v1/shopping/lists/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Erro ao criar lista');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro ao criar lista');
+        }
+    }
+
+    async function addItem(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = {
+            name: formData.get('name'),
+            quantity: parseInt(formData.get('quantity')),
+            category: formData.get('category'),
+            priority: formData.get('priority'),
+            notes: formData.get('notes'),
+            shopping_list_id: parseInt(formData.get('shopping_list_id'))
+        };
+
+        try {
+            const response = await fetch(`/api/v1/shopping/lists/${data.shopping_list_id}/items/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Erro ao adicionar item');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro ao adicionar item');
+        }
+    }
+
+    async function deleteList(listId) {
+        if (!confirm('Tem certeza que deseja excluir esta lista?')) return;
+
+        try {
+            const response = await fetch(`/api/v1/shopping/lists/${listId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Erro ao excluir lista');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro ao excluir lista');
+        }
+    }
+
+    async function deleteItem(listId, itemId) {
+        if (!confirm('Tem certeza que deseja excluir este item?')) return;
+
+        try {
+            const response = await fetch(`/api/v1/shopping/lists/${listId}/items/${itemId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Erro ao excluir item');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro ao excluir item');
+        }
+    }
+
+    async function toggleItemPurchased(listId, itemId, purchased) {
+        try {
+            const response = await fetch(`/api/v1/shopping/lists/${listId}/items/${itemId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: purchased ? 'BOUGHT' : 'PENDING' })
+            });
+
+            if (!response.ok) {
+                alert('Erro ao atualizar item');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro ao atualizar item');
+        }
+    }
+
+    // Adicionar event listeners
+    document.getElementById('createListForm').addEventListener('submit', createList);
+    document.getElementById('addItemForm').addEventListener('submit', addItem);
+</script>
+{% endblock %} 

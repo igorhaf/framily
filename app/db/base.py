@@ -7,6 +7,7 @@ from app.models.event import Event  # noqa
 from app.models.finance import FinanceCategory, FinanceTransaction, FinanceBudget  # noqa
 from app.models.health import HealthAppointment, HealthMedication, HealthExam  # noqa
 from app.models.calendar import CalendarEvent  # noqa
+from app.models.shopping import ShoppingList, ShoppingItem  # noqa
 
 # Importar todos os modelos aqui para que o Alembic os detecte
-__all__ = ["Base", "CalendarEvent"] 
+__all__ = ["Base", "CalendarEvent", "ShoppingList", "ShoppingItem"] 
