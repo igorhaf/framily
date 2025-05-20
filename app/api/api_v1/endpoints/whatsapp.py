@@ -5,6 +5,7 @@ from app.api import deps
 from app.crud.crud_task import get_multi
 from app.core.twilio_config import get_twilio_settings
 from twilio.rest import Client
+from app.crud.crud_shopping import shopping_list, shopping_item
 import logging
 import traceback
 
@@ -68,8 +69,98 @@ async def whatsapp_webhook(request: Request, db: Session = Depends(deps.get_db))
                 logger.error(f"Erro ao buscar tarefas: {str(e)}")
                 logger.error(f"Traceback: {traceback.format_exc()}")
                 resp.message(f"Erro ao buscar tarefas: {str(e)}")
+        
+        # Verificar se a mensagem é "listas de compras" 
+        elif message_body == "listas de compras":
+            try:
+                # Buscar listas de compras no banco de dados
+                shopping_lists = shopping_list.get_multi(db=db, limit=10)
+                logger.info(f"Listas de compras encontradas: {len(shopping_lists)}")
+                
+                if not shopping_lists:
+                    resp.message("Não há listas de compras cadastradas no momento.")
+                else:
+                    # Formatar as listas de compras
+                    message = "🛒 Listas de Compras:\n"
+                    for shop_list in shopping_lists:
+                        item_count = len(shop_list.items)
+                        message += f"• {shop_list.name} ({item_count} itens)\n"
+                    
+                    message += "\nEnvie o nome de uma lista para ver seus itens."
+                    resp.message(message)
+            except Exception as e:
+                logger.error(f"Erro ao buscar listas de compras: {str(e)}")
+                logger.error(f"Traceback: {traceback.format_exc()}")
+                resp.message(f"Erro ao buscar listas de compras: {str(e)}")
+        
+        # Verificar se a mensagem corresponde a alguma lista de compras
         else:
-            resp.message("Olá! Para ver a lista de tarefas, envie 'lista de tarefas'.")
+            try:
+                # Procurar por uma lista que corresponda à mensagem (case insensitive)
+                # Primeiro tentamos encontrar correspondências exatas
+                shop_list = None
+                shop_lists = shopping_list.get_multi(db=db)
+                
+                # Procura por correspondência exata (case insensitive)
+                for lista in shop_lists:
+                    if lista.name.lower() == message_body.lower():
+                        shop_list = lista
+                        break
+                
+                # Se não encontrou, procura por correspondência parcial
+                if not shop_list:
+                    for lista in shop_lists:
+                        if message_body.lower() in lista.name.lower():
+                            shop_list = lista
+                            break
+                
+                if shop_list:
+                    # Mostrar os itens da lista
+                    if not shop_list.items:
+                        resp.message(f"A lista '{shop_list.name}' está vazia.")
+                    else:
+                        message = f"🛒 Itens da lista '{shop_list.name}':\n"
+                        
+                        # Agrupar itens por status
+                        pending_items = [item for item in shop_list.items if item.status != "BOUGHT"]
+                        bought_items = [item for item in shop_list.items if item.status == "BOUGHT"]
+                        
+                        # Primeiro mostrar itens pendentes
+                        if pending_items:
+                            message += "\n📌 Pendentes:\n"
+                            for item in pending_items:
+                                priority = ""
+                                if item.priority == "HIGH":
+                                    priority = "⚠️ "
+                                elif item.priority == "LOW":
+                                    priority = "🔽 "
+                                
+                                category_icon = "🍎"
+                                if item.category == "CLEANING":
+                                    category_icon = "🧹"
+                                elif item.category == "HYGIENE":
+                                    category_icon = "🧼"
+                                elif item.category == "HOUSEHOLD":
+                                    category_icon = "🏠"
+                                
+                                message += f"{priority}{category_icon} {item.name} ({item.quantity})\n"
+                        
+                        # Depois mostrar itens já comprados
+                        if bought_items:
+                            message += "\n✅ Comprados:\n"
+                            for item in bought_items:
+                                message += f"{item.name} ({item.quantity})\n"
+                        
+                        message += "\nTotal: " + str(len(shop_list.items)) + " itens"
+                        
+                        resp.message(message)
+                else:
+                    # Mensagem padrão
+                    resp.message("Olá! Você pode enviar:\n- 'lista de tarefas' para ver suas tarefas\n- 'listas de compras' para ver suas listas de compras")
+            except Exception as e:
+                logger.error(f"Erro ao processar listas: {str(e)}")
+                logger.error(f"Traceback: {traceback.format_exc()}")
+                resp.message(f"Erro ao processar sua mensagem: {str(e)}")
         
         # Retornar a resposta com o cabeçalho correto
         response_content = str(resp)

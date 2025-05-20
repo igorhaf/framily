@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Teste de Compras{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Teste de Listas de Compras</h1>
+    
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Informações de Depuração</h2>
+        <p>Total de listas: {{ shopping_lists|length }}</p>
+    </div>
+    
+    {% for list in shopping_lists %}
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-bold">Lista: {{ list.name }}</h2>
+        <p>ID: {{ list.id }}</p>
+        <p>Descrição: {{ list.description }}</p>
+        <p>Tipo de list.items: {{ list.items.__class__.__name__ }}</p>
+        <p>Total de itens: {{ list.items|length if list.items else 0 }}</p>
+        
+        {% if list.items %}
+            <h3 class="font-bold mt-4">Itens ({{ list.items|length }}):</h3>
+            <ul class="mt-2 space-y-2">
+                {% for item in list.items %}
+                <li class="border p-3 rounded">
+                    <p>Nome: {{ item.name }}</p>
+                    <p>ID: {{ item.id }}</p>
+                    <p>Categoria: {{ item.category }} (Tipo: {{ item.category.__class__.__name__ }})</p>
+                    <p>Status: {{ item.status }} (Tipo: {{ item.status.__class__.__name__ }})</p>
+                    <p>Status.name: {{ item.status.name }}</p>
+                    <p>Status.value: {{ item.status.value }}</p>
+                    <p>Verificações:</p>
+                    <ul>
+                        <li>item.status.name == 'BOUGHT': {{ item.status.name == 'BOUGHT' }}</li>
+                        <li>item.status.name == 'PENDING': {{ item.status.name == 'PENDING' }}</li>
+                    </ul>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="mt-4 text-red-500">Esta lista não possui itens!</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+    
+    {% if not shopping_lists %}
+    <div class="bg-white rounded-lg shadow p-6 text-center">
+        <p class="text-red-500">Não há listas de compras no banco de dados!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

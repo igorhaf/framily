@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Debug Compras{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Debug de Listas de Compras</h1>
+    
+    <h2 class="text-xl font-bold text-gray-900 mb-4">Listas: {{ shopping_lists|length }}</h2>
+    
+    {% for list in shopping_lists %}
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h3 class="text-lg font-bold">Lista: {{ list.name }}</h3>
+        <p>ID: {{ list.id }}</p>
+        <p>Descrição: {{ list.description }}</p>
+        <p>Total de itens: {{ list.items|length if list.items else 0 }}</p>
+        
+        {% if list.items %}
+        <div class="mt-4">
+            <h4 class="font-bold">Itens:</h4>
+            <table class="min-w-full divide-y divide-gray-200 mt-2">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2 text-left">ID</th>
+                        <th class="px-4 py-2 text-left">Nome</th>
+                        <th class="px-4 py-2 text-left">Categoria</th>
+                        <th class="px-4 py-2 text-left">Tipo Categoria</th>
+                        <th class="px-4 py-2 text-left">Prioridade</th>
+                        <th class="px-4 py-2 text-left">Status</th>
+                        <th class="px-4 py-2 text-left">Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    {% for item in list.items %}
+                    <tr>
+                        <td class="px-4 py-2">{{ item.id }}</td>
+                        <td class="px-4 py-2">{{ item.name }}</td>
+                        <td class="px-4 py-2">{{ item.category }}</td>
+                        <td class="px-4 py-2">{{ item.category.__class__.__name__ }}</td>
+                        <td class="px-4 py-2">{{ item.priority }}</td>
+                        <td class="px-4 py-2">{{ item.status }}</td>
+                        <td class="px-4 py-2">{{ item.quantity }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="mt-4 text-red-500">Esta lista não possui itens!</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+    
+    {% if not shopping_lists %}
+    <div class="bg-white rounded-lg shadow p-6 text-center">
+        <p class="text-red-500">Não há listas de compras no banco de dados!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

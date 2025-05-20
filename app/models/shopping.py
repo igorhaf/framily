@@ -12,7 +12,7 @@ class PriorityEnum(str, enum.Enum):
 
 class StatusEnum(str, enum.Enum):
     PENDING = "PENDING"
-    PURCHASED = "BOUGHT"
+    BOUGHT = "BOUGHT"
     CANCELLED = "CANCELLED"
 
 class CategoryEnum(str, enum.Enum):

@@ -3,117 +3,121 @@
 {% block title %}Finanças{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
-    <!-- Resumo Financeiro -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Receitas -->
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">
-                                Receitas do Mês
-                            </dt>
-                            <dd class="flex items-baseline">
-                                <div class="text-2xl font-semibold text-gray-900" id="totalIncome">
-                                    Carregando...
-                                </div>
-                            </dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Despesas -->
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">
-                                Despesas do Mês
-                            </dt>
-                            <dd class="flex items-baseline">
-                                <div class="text-2xl font-semibold text-gray-900" id="totalExpenses">
-                                    Carregando...
-                                </div>
-                            </dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Saldo -->
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">
-                                Saldo do Mês
-                            </dt>
-                            <dd class="flex items-baseline">
-                                <div class="text-2xl font-semibold text-gray-900" id="balance">
-                                    Carregando...
-                                </div>
-                            </dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="container mx-auto px-4 py-8">
+    <!-- Loading Indicator -->
+    <div id="loading" class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
     </div>
 
-    <!-- Orçamento por Categoria -->
-    <div class="bg-white shadow rounded-lg">
-        <div class="px-4 py-5 sm:px-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Orçamento por Categoria</h3>
-            <p class="mt-1 max-w-2xl text-sm text-gray-500">Acompanhe seus gastos por categoria.</p>
-        </div>
-        <div class="border-t border-gray-200">
-            <div class="px-4 py-5 sm:p-6">
-                <div class="space-y-4" id="categoryBudget">
-                    <div class="text-center text-gray-500">Carregando categorias...</div>
+    <!-- Error Message -->
+    <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <span class="block sm:inline"></span>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div id="dashboard-content" class="hidden">
+        <!-- Estatísticas Rápidas -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Receitas -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500">Receitas do Mês</h3>
+                        <p id="totalIncome" class="text-2xl font-semibold text-gray-900">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Despesas -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-red-100 text-red-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500">Despesas do Mês</h3>
+                        <p id="totalExpenses" class="text-2xl font-semibold text-gray-900">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Saldo -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500">Saldo do Mês</h3>
+                        <p id="balance" class="text-2xl font-semibold text-gray-900">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categorias -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500">Categorias</h3>
+                        <p id="totalCategories" class="text-2xl font-semibold text-gray-900">Carregando...</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Últimas Transações -->
-    <div class="bg-white shadow rounded-lg">
-        <div class="px-4 py-5 sm:px-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Últimas Transações</h3>
-            <p class="mt-1 max-w-2xl text-sm text-gray-500">Histórico de receitas e despesas.</p>
-        </div>
-        <div class="border-t border-gray-200">
-            <div class="px-4 py-5 sm:p-6">
-                <div class="space-y-4" id="recentTransactions">
-                    <div class="text-center text-gray-500">Carregando transações...</div>
+        <!-- Conteúdo Principal -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Orçamento por Categoria -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Orçamento por Categoria</h3>
+                </div>
+                <div class="p-6">
+                    <div id="categoryBudget" class="space-y-4">
+                        <div class="text-center text-gray-500">Carregando categorias...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Últimas Transações -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Últimas Transações</h3>
+                </div>
+                <div class="p-6">
+                    <div id="recentTransactions" class="space-y-4">
+                        <div class="text-center text-gray-500">Carregando transações...</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
+    function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        const errorMessage = errorDiv.querySelector('span');
+        errorMessage.textContent = message;
+        errorDiv.classList.remove('hidden');
+    }
+
     // Função para formatar valores monetários
     function formatCurrency(value) {
         return new Intl.NumberFormat('pt-BR', {
@@ -155,6 +159,9 @@
                 categoryNames[cat.id] = cat.name;
             });
             
+            // Atualiza o total de categorias
+            document.getElementById('totalCategories').textContent = categories.length;
+            
             // Agrupa categorias por tipo
             const incomeCategories = [];
             const expenseCategories = [];
@@ -179,18 +186,18 @@
                     <div class="mb-6">
                         <h4 class="text-sm font-medium text-gray-900 mb-4">Receitas</h4>
                         ${incomeCategories.map(cat => `
-                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <div class="bg-green-50 rounded-lg p-4 mb-4">
                                 <div class="flex justify-between items-center mb-2">
-                                    <h4 class="text-sm font-medium text-gray-900">${cat.name}</h4>
-                                    <span class="text-sm text-gray-500">${formatCurrency(cat.income)}</span>
+                                    <h4 class="text-sm font-medium text-green-900">${cat.name}</h4>
+                                    <span class="text-sm text-green-600">${formatCurrency(cat.income)}</span>
                                 </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                                <div class="w-full bg-green-200 rounded-full h-2.5 mb-2">
                                     <div class="bg-green-600 h-2.5 rounded-full" 
                                          style="width: ${Math.min((cat.income / data.total_income) * 100, 100)}%"></div>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-sm text-gray-500">Recebido: ${formatCurrency(cat.income)}</span>
-                                    <span class="text-sm text-gray-500">Total: ${formatCurrency(cat.income)}</span>
+                                    <span class="text-sm text-green-600">Recebido: ${formatCurrency(cat.income)}</span>
+                                    <span class="text-sm text-green-600">Total: ${formatCurrency(cat.income)}</span>
                                 </div>
                             </div>
                         `).join('')}
@@ -201,18 +208,18 @@
                     <div>
                         <h4 class="text-sm font-medium text-gray-900 mb-4">Despesas</h4>
                         ${expenseCategories.map(cat => `
-                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <div class="bg-red-50 rounded-lg p-4 mb-4">
                                 <div class="flex justify-between items-center mb-2">
-                                    <h4 class="text-sm font-medium text-gray-900">${cat.name}</h4>
-                                    <span class="text-sm text-gray-500">${formatCurrency(cat.expense)}</span>
+                                    <h4 class="text-sm font-medium text-red-900">${cat.name}</h4>
+                                    <span class="text-sm text-red-600">${formatCurrency(cat.expense)}</span>
                                 </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                                    <div class="bg-blue-600 h-2.5 rounded-full" 
+                                <div class="w-full bg-red-200 rounded-full h-2.5 mb-2">
+                                    <div class="bg-red-600 h-2.5 rounded-full" 
                                          style="width: ${Math.min((cat.expense / data.total_expenses) * 100, 100)}%"></div>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-sm text-gray-500">Gasto: ${formatCurrency(cat.expense)}</span>
-                                    <span class="text-sm text-gray-500">Orçamento: ${formatCurrency(cat.expense)}</span>
+                                    <span class="text-sm text-red-600">Gasto: ${formatCurrency(cat.expense)}</span>
+                                    <span class="text-sm text-red-600">Orçamento: ${formatCurrency(cat.expense)}</span>
                                 </div>
                             </div>
                         `).join('')}
@@ -222,14 +229,7 @@
             
         } catch (error) {
             console.error('Erro ao carregar resumo financeiro:', error);
-            document.getElementById('totalIncome').textContent = 'Erro';
-            document.getElementById('totalExpenses').textContent = 'Erro';
-            document.getElementById('balance').textContent = 'Erro';
-            document.getElementById('categoryBudget').innerHTML = `
-                <div class="text-center text-red-500">
-                    Erro ao carregar dados: ${error.message}
-                </div>
-            `;
+            showError(`Erro ao carregar dados: ${error.message}`);
         }
     }
 
@@ -248,55 +248,54 @@
                 return;
             }
             
-            // Buscar nomes das categorias
-            const categoriesResponse = await fetch('/api/v1/finance/categories/');
-            if (!categoriesResponse.ok) {
-                throw new Error(`Erro ao carregar categorias: ${categoriesResponse.status}`);
-            }
-            const categories = await categoriesResponse.json();
-            const categoryNames = {};
-            categories.forEach(cat => {
-                categoryNames[cat.id] = cat.name;
-            });
-            
             recentTransactions.innerHTML = transactions.map(transaction => `
-                <div class="flex items-center justify-between py-3 border-b border-gray-200 last:border-0">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <svg class="h-6 w-6 ${transaction.type === 'INCOME' ? 'text-green-400' : 'text-red-400'}" 
-                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div class="flex items-center p-4 ${transaction.type === 'INCOME' ? 'bg-green-50' : 'bg-red-50'} rounded-lg">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 rounded-full ${transaction.type === 'INCOME' ? 'bg-green-100' : 'bg-red-100'} flex items-center justify-center">
+                            <svg class="w-6 h-6 ${transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-900">${categoryNames[transaction.category_id] || 'Categoria'}</p>
-                            <p class="text-sm text-gray-500">${transaction.description}</p>
-                        </div>
                     </div>
-                    <div class="ml-4 flex-shrink-0">
-                        <p class="text-sm font-medium ${transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'}">
-                            ${transaction.type === 'INCOME' ? '+' : '-'}${formatCurrency(transaction.amount)}
-                        </p>
-                        <p class="text-sm text-gray-500">${new Date(transaction.date).toLocaleDateString('pt-BR')}</p>
+                    <div class="ml-4">
+                        <h4 class="text-sm font-medium ${transaction.type === 'INCOME' ? 'text-green-900' : 'text-red-900'}">${transaction.description}</h4>
+                        <p class="text-sm ${transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'}">${new Date(transaction.date).toLocaleDateString()}</p>
+                    </div>
+                    <div class="ml-auto">
+                        <span class="text-sm font-medium ${transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'}">
+                            ${transaction.type === 'INCOME' ? '+' : '-'} ${formatCurrency(transaction.amount)}
+                        </span>
                     </div>
                 </div>
             `).join('');
             
         } catch (error) {
-            console.error('Erro ao carregar transações:', error);
-            document.getElementById('recentTransactions').innerHTML = `
-                <div class="text-center text-red-500">
-                    Erro ao carregar transações: ${error.message}
-                </div>
-            `;
+            console.error('Erro ao carregar transações recentes:', error);
+            showError(`Erro ao carregar transações: ${error.message}`);
         }
     }
 
-    // Carregar dados quando a página carregar
-    document.addEventListener('DOMContentLoaded', () => {
-        loadFinancialSummary();
-        loadRecentTransactions();
-    });
+    // Função para inicializar a página
+    async function initializePage() {
+        try {
+            // Carrega todos os dados em paralelo
+            await Promise.all([
+                loadFinancialSummary(),
+                loadRecentTransactions()
+            ]);
+            
+            // Esconde o loading e mostra o conteúdo
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('dashboard-content').classList.remove('hidden');
+            
+        } catch (error) {
+            console.error('Erro ao inicializar página:', error);
+            showError(`Erro ao carregar dados: ${error.message}`);
+            document.getElementById('loading').classList.add('hidden');
+        }
+    }
+
+    // Inicializa a página quando o DOM estiver carregado
+    document.addEventListener('DOMContentLoaded', initializePage);
 </script>
 {% endblock %} 
