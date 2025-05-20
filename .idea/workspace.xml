@@ -6,6 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="3eb0fcfe-8f57-41b5-bc74-42454b02eeb0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FastAPIProject_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/framily_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FastAPIProject_environment.json" beforeDir="false" afterPath="$PROJECT_DIR$/framily_environment.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/POSTMAN_README.md" beforeDir="false" afterPath="$PROJECT_DIR$/POSTMAN_README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/.venv/Scripts/activate" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/.venv/Scripts/activate" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/.venv/Scripts/activate.bat" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/.venv/Scripts/activate.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/.venv/pyvenv.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/.venv/pyvenv.cfg" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,22 +37,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;FastAPI.FastAPIProject.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;paginas-internas&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "FastAPI.FastAPIProject.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/ihaf/PycharmProjects/framily",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="FastAPIProject" type="Python.FastAPI">
       <option name="file" value="$PROJECT_DIR$/main.py" />
@@ -81,6 +89,7 @@
       <updated>1747510720819</updated>
       <workItem from="1747510722021" duration="1392000" />
       <workItem from="1747567585110" duration="10386000" />
+      <workItem from="1747697606855" duration="700000" />
     </task>
     <servers />
   </component>

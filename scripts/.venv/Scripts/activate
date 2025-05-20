@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\ihaf\PycharmProjects\FastAPIProject\scripts\.venv"
+VIRTUAL_ENV="C:\Users\ihaf\PycharmProjects\framily\scripts\.venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

@@ -4,14 +4,14 @@ Esta pasta contém arquivos de coleção e ambiente do Postman para testar e exp
 
 ## Arquivos Incluídos
 
-- `FastAPIProject_collection.json`: Coleção do Postman com todos os endpoints da API
-- `FastAPIProject_environment.json`: Arquivo de ambiente do Postman para desenvolvimento local
+- `framily_collection.json`: Coleção do Postman com todos os endpoints da API
+- `framily_environment.json`: Arquivo de ambiente do Postman para desenvolvimento local
 
 ## Como Importar no Postman
 
 1. Abra o Postman
 2. Clique em "Import" no canto superior esquerdo
-3. Arraste os arquivos ou clique para selecionar os arquivos `FastAPIProject_collection.json` e `FastAPIProject_environment.json`
+3. Arraste os arquivos ou clique para selecionar os arquivos `framily_collection.json` e `framily_environment.json`
 4. Confirme a importação
 
 ## Como Usar
