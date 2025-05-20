@@ -16,40 +16,6 @@
 
     <!-- Dashboard Content -->
     <div id="dashboard-content" class="hidden">
-        <!-- Calendário -->
-        <div class="bg-white rounded-lg shadow mb-8">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-semibold text-gray-900">Calendário de Eventos</h3>
-                    <div class="flex space-x-2">
-                        <button id="prevMonth" class="p-2 rounded-full hover:bg-gray-100">
-                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </button>
-                        <button id="nextMonth" class="p-2 rounded-full hover:bg-gray-100">
-                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="p-6">
-                <div id="calendar" class="grid grid-cols-7 gap-2">
-                    <!-- Dias da semana -->
-                    <div class="text-center font-medium text-gray-500">Dom</div>
-                    <div class="text-center font-medium text-gray-500">Seg</div>
-                    <div class="text-center font-medium text-gray-500">Ter</div>
-                    <div class="text-center font-medium text-gray-500">Qua</div>
-                    <div class="text-center font-medium text-gray-500">Qui</div>
-                    <div class="text-center font-medium text-gray-500">Sex</div>
-                    <div class="text-center font-medium text-gray-500">Sáb</div>
-                    <!-- Dias do mês serão inseridos via JavaScript -->
-                </div>
-            </div>
-        </div>
-
         <!-- Legenda -->
         <div class="bg-white rounded-lg shadow p-4 mb-8">
             <h4 class="text-sm font-medium text-gray-900 mb-3">Legenda</h4>
@@ -69,14 +35,51 @@
             </div>
         </div>
 
-        <!-- Eventos do Dia Selecionado -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Eventos do Dia</h3>
+        <!-- Layout Principal -->
+        <div class="grid grid-cols-3 gap-8">
+            <!-- Calendário (2/3) -->
+            <div class="col-span-2 bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">Calendário de Eventos</h3>
+                        <div class="flex space-x-2">
+                            <button id="prevMonth" class="p-2 rounded-full hover:bg-gray-100">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
+                            <button id="nextMonth" class="p-2 rounded-full hover:bg-gray-100">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div id="calendar" class="grid grid-cols-7 gap-2">
+                        <!-- Dias da semana -->
+                        <div class="text-center font-medium text-gray-500">Dom</div>
+                        <div class="text-center font-medium text-gray-500">Seg</div>
+                        <div class="text-center font-medium text-gray-500">Ter</div>
+                        <div class="text-center font-medium text-gray-500">Qua</div>
+                        <div class="text-center font-medium text-gray-500">Qui</div>
+                        <div class="text-center font-medium text-gray-500">Sex</div>
+                        <div class="text-center font-medium text-gray-500">Sáb</div>
+                        <!-- Dias do mês serão inseridos via JavaScript -->
+                    </div>
+                </div>
             </div>
-            <div class="p-6">
-                <div id="selectedDayEvents" class="space-y-4">
-                    <div class="text-center text-gray-500">Selecione um dia no calendário para ver os eventos</div>
+
+            <!-- Eventos do Dia (1/3) -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900" id="eventsTitle">Próximos Eventos</h3>
+                </div>
+                <div class="p-6">
+                    <div id="selectedDayEvents" class="space-y-4">
+                        <div class="text-center text-gray-500">Carregando eventos...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -103,7 +106,8 @@
     // Função para formatar a hora
     function formatTime(timeString) {
         if (!timeString) return '';
-        return timeString.substring(0, 5);
+        const date = new Date(timeString);
+        return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     }
 
     // Variáveis globais para o calendário
@@ -206,6 +210,71 @@
         }
     }
 
+    // Função para mostrar os próximos eventos
+    function showNextEvents() {
+        const now = new Date();
+        const nextEvents = events
+            .filter(event => new Date(event.start_date) > now)
+            .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
+            .slice(0, 5);
+
+        const selectedDayEvents = document.getElementById('selectedDayEvents');
+        document.getElementById('eventsTitle').textContent = 'Próximos Eventos';
+        
+        if (nextEvents.length === 0) {
+            selectedDayEvents.innerHTML = '<div class="text-center text-gray-500">Nenhum evento futuro</div>';
+            return;
+        }
+
+        selectedDayEvents.innerHTML = nextEvents.map(event => `
+            <div class="bg-white rounded-lg p-4 border ${
+                event.event_type === 'recurring' ? 'border-green-200' :
+                event.event_type === 'important' ? 'border-red-200' :
+                'border-blue-200'
+            }">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-sm font-medium ${
+                        event.event_type === 'recurring' ? 'text-green-900' :
+                        event.event_type === 'important' ? 'text-red-900' :
+                        'text-blue-900'
+                    }">${event.title}</h4>
+                    <span class="text-sm ${
+                        event.event_type === 'recurring' ? 'text-green-600' :
+                        event.event_type === 'important' ? 'text-red-600' :
+                        'text-blue-600'
+                    }">${formatDate(event.start_date)} ${formatTime(event.start_date)}</span>
+                </div>
+                ${event.description ? `
+                    <p class="text-sm ${
+                        event.event_type === 'recurring' ? 'text-green-700' :
+                        event.event_type === 'important' ? 'text-red-700' :
+                        'text-blue-700'
+                    } mb-2">${event.description}</p>
+                ` : ''}
+                <div class="flex justify-between items-center">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        event.event_type === 'recurring' ? 'bg-green-100 text-green-800' :
+                        event.event_type === 'important' ? 'bg-red-100 text-red-800' :
+                        'bg-blue-100 text-blue-800'
+                    }">
+                        ${event.event_type === 'recurring' ? 'Recorrente' :
+                          event.event_type === 'important' ? 'Importante' :
+                          event.event_type || 'Evento'}
+                    </span>
+                    ${event.location ? `
+                        <span class="text-sm text-gray-600">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            ${event.location}
+                        </span>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
+
     // Função para selecionar uma data
     function selectDate(dateString) {
         selectedDate = new Date(dateString);
@@ -216,6 +285,7 @@
         });
 
         const selectedDayEvents = document.getElementById('selectedDayEvents');
+        document.getElementById('eventsTitle').textContent = `Eventos de ${formatDate(dateString)}`;
         
         if (dayEvents.length === 0) {
             selectedDayEvents.innerHTML = '<div class="text-center text-gray-500">Nenhum evento para este dia</div>';
@@ -305,6 +375,9 @@
 
             // Gera o calendário
             generateCalendar();
+            
+            // Mostra os próximos eventos
+            showNextEvents();
             
         } catch (error) {
             console.error('Erro ao carregar eventos:', error);
