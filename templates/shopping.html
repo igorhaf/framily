@@ -29,13 +29,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Total de Itens</h3>
-                    <p class="text-2xl font-semibold text-gray-900">
-                        {% set total_items = 0 %}
-                        {% for list in shopping_lists %}
-                            {% set total_items = total_items + list.items|length %}
-                        {% endfor %}
-                        {{ total_items }}
-                    </p>
+                    <p class="text-2xl font-semibold text-gray-900">{{ total_items }}</p>
                 </div>
             </div>
         </div>
@@ -49,17 +43,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Itens Pendentes</h3>
-                    <p class="text-2xl font-semibold text-gray-900">
-                        {% set pending_items = 0 %}
-                        {% for list in shopping_lists %}
-                            {% for item in list.items %}
-                                {% if item.status.name != 'BOUGHT' %}
-                                    {% set pending_items = pending_items + 1 %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                        {{ pending_items }}
-                    </p>
+                    <p class="text-2xl font-semibold text-gray-900">{{ pending_items }}</p>
                 </div>
             </div>
         </div>
@@ -73,17 +57,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-sm font-medium text-gray-500">Itens Comprados</h3>
-                    <p class="text-2xl font-semibold text-gray-900">
-                        {% set bought_items = 0 %}
-                        {% for list in shopping_lists %}
-                            {% for item in list.items %}
-                                {% if item.status.name == 'BOUGHT' %}
-                                    {% set bought_items = bought_items + 1 %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                        {{ bought_items }}
-                    </p>
+                    <p class="text-2xl font-semibold text-gray-900">{{ bought_items }}</p>
                 </div>
             </div>
         </div>
@@ -120,196 +94,102 @@
                 </div>
             </div>
             
-            <div class="p-6">
-                <!-- Contador de itens -->
-                <div class="mb-4 flex justify-between">
-                    <span class="text-sm text-gray-500">
-                        {{ list.items|length }} itens
-                    </span>
-                    <span class="text-sm">
-                        <span class="text-green-600 font-medium">
-                            {% set bought = 0 %}
-                            {% for item in list.items %}
-                                {% if item.status.name == 'BOUGHT' %}
-                                    {% set bought = bought + 1 %}
+            <!-- Lista de Itens -->
+            <div class="divide-y divide-gray-200">
+                {% if list.items %}
+                    {% for item in list.items %}
+                    <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-shrink-0">
+                                {% if item.category == 'FOOD' %}
+                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                    </svg>
+                                {% elif item.category == 'CLEANING' %}
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                                    </svg>
+                                {% elif item.category == 'HYGIENE' %}
+                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                                    </svg>
+                                {% elif item.category == 'HOUSEHOLD' %}
+                                    <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                    </svg>
+                                {% else %}
+                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                    </svg>
                                 {% endif %}
-                            {% endfor %}
-                            {{ bought }}
-                        </span>
-                        <span class="text-gray-500">/</span>
-                        <span class="text-yellow-600 font-medium">
-                            {{ list.items|length - bought }}
-                        </span>
-                    </span>
-                </div>
-                
-                <!-- Itens Pendentes -->
-                {% set pending_items = [] %}
-                {% for item in list.items %}
-                    {% if item.status.name != 'BOUGHT' %}
-                        {% set pending_items = pending_items + [item] %}
-                    {% endif %}
-                {% endfor %}
-                
-                {% if pending_items %}
-                <div class="mb-4">
-                    <h3 class="text-sm font-medium text-gray-700 mb-2">Pendentes</h3>
-                    <div class="space-y-3">
-                        {% for item in pending_items %}
-                        <div class="flex items-center justify-between p-3 rounded-lg
-                            {% if item.category.name == 'FOOD' %}bg-green-50{% 
-                            elif item.category.name == 'CLEANING' %}bg-blue-50{% 
-                            elif item.category.name == 'HYGIENE' %}bg-purple-50{% 
-                            elif item.category.name == 'HOUSEHOLD' %}bg-yellow-50{% 
-                            else %}bg-gray-50{% endif %}">
-                            <div class="flex items-center space-x-3">
-                                <div class="flex-shrink-0">
-                                    <!-- Ícone para categoria -->
-                                    <div class="w-10 h-10 rounded-full
-                                        {% if item.category.name == 'FOOD' %}bg-green-100{% 
-                                        elif item.category.name == 'CLEANING' %}bg-blue-100{% 
-                                        elif item.category.name == 'HYGIENE' %}bg-purple-100{% 
-                                        elif item.category.name == 'HOUSEHOLD' %}bg-yellow-100{% 
-                                        else %}bg-gray-100{% endif %} 
-                                        flex items-center justify-center">
-                                        {% if item.category.name == 'FOOD' %}
-                                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                            </svg>
-                                        {% elif item.category.name == 'CLEANING' %}
-                                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2M3 16V6a1 1 0 011-1h2M6 8V6a1 1 0 011-1h2m-2 1v2m-2 0h2m-2 0H3m0 0h2m9 5V6a1 1 0 00-1-1h-2m2 1v2m2 0h-2m2 0h3m0 0h-3"></path>
-                                            </svg>
-                                        {% elif item.category.name == 'HYGIENE' %}
-                                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
-                                            </svg>
-                                        {% elif item.category.name == 'HOUSEHOLD' %}
-                                            <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                                            </svg>
-                                        {% else %}
-                                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                                            </svg>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="ml-3">
-                                    <div class="flex items-center">
-                                        {% if item.priority.name == 'HIGH' %}
-                                            <span class="inline-flex items-center justify-center w-4 h-4 mr-2 bg-red-100 text-red-800 rounded-full">
-                                                <span class="text-xs font-bold">!</span>
-                                            </span>
-                                        {% endif %}
-                                        <h4 class="text-sm font-medium 
-                                            {% if item.category.name == 'FOOD' %}text-green-900{% 
-                                            elif item.category.name == 'CLEANING' %}text-blue-900{% 
-                                            elif item.category.name == 'HYGIENE' %}text-purple-900{% 
-                                            elif item.category.name == 'HOUSEHOLD' %}text-yellow-900{% 
-                                            else %}text-gray-900{% endif %}">{{ item.name }}</h4>
-                                    </div>
-                                    {% if item.notes %}
-                                        <p class="text-xs text-gray-500 mt-1">{{ item.notes }}</p>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-900">{{ item.name }}</h3>
+                                <p class="text-sm text-gray-500">
+                                    {% if item.quantity > 1 %}
+                                        {{ item.quantity }} unidades
                                     {% endif %}
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <span class="font-semibold px-2 py-1 bg-white rounded-lg text-sm">{{ item.quantity }}</span>
-                                <div class="flex space-x-1">
-                                    <button onclick="toggleItemPurchased({{ list.id }}, {{ item.id }}, true)" class="text-green-600 hover:text-green-800 bg-green-100 p-1.5 rounded-full">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                    </button>
-                                    <button onclick="deleteItem({{ list.id }}, {{ item.id }})" class="text-red-600 hover:text-red-800 bg-red-100 p-1.5 rounded-full">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
+                                    {% if item.notes %}
+                                        - {{ item.notes }}
+                                    {% endif %}
+                                </p>
                             </div>
                         </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-                
-                <!-- Itens Comprados -->
-                {% set bought_items = [] %}
-                {% for item in list.items %}
-                    {% if item.status.name == 'BOUGHT' %}
-                        {% set bought_items = bought_items + [item] %}
-                    {% endif %}
-                {% endfor %}
-                
-                {% if bought_items %}
-                <div>
-                    <h3 class="text-sm font-medium text-gray-700 mb-2">Comprados</h3>
-                    <div class="space-y-2">
-                        {% for item in bought_items %}
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg opacity-75">
-                            <div class="flex items-center space-x-3">
-                                <h4 class="text-sm line-through text-gray-500">{{ item.name }}</h4>
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <span class="text-sm text-gray-400">{{ item.quantity }}</span>
-                                <div class="flex space-x-1">
-                                    <button onclick="toggleItemPurchased({{ list.id }}, {{ item.id }}, false)" class="text-gray-500 hover:text-gray-700 bg-gray-200 p-1.5 rounded-full">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="toggleItemPurchased({{ list.id }}, {{ item.id }}, {{ 'false' if item.status.value == 'BOUGHT' else 'true' }})" 
+                                    class="text-sm px-3 py-1 rounded-full {{ 'bg-green-100 text-green-800' if item.status.value == 'BOUGHT' else 'bg-yellow-100 text-yellow-800' }}">
+                                {{ 'Comprado' if item.status.value == 'BOUGHT' else 'Pendente' }}
+                            </button>
+                            <button onclick="deleteItem({{ list.id }}, {{ item.id }})" class="text-red-600 hover:text-red-800">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
                         </div>
-                        {% endfor %}
                     </div>
-                </div>
-                {% endif %}
-                
-                {% if not list.items %}
-                <div class="text-center py-6">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhum item</h3>
-                    <p class="mt-1 text-sm text-gray-500">Adicione itens a esta lista de compras.</p>
-                    <div class="mt-6">
-                        <button onclick="openAddItemModal({{ list.id }})" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Adicionar um item
-                        </button>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-6">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhum item</h3>
+                        <p class="mt-1 text-sm text-gray-500">Adicione itens a esta lista de compras.</p>
+                        <div class="mt-6">
+                            <button onclick="openAddItemModal({{ list.id }})" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Adicionar um item
+                            </button>
+                        </div>
                     </div>
-                </div>
                 {% endif %}
             </div>
         </div>
         {% endfor %}
         
         {% if not shopping_lists %}
-        <div class="col-span-1 md:col-span-2 lg:col-span-3 bg-white rounded-lg shadow p-8 text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhuma lista</h3>
-            <p class="mt-1 text-sm text-gray-500">Crie uma nova lista de compras para começar.</p>
-            <div class="mt-6">
-                <button onclick="openCreateListModal()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    Nova Lista
-                </button>
+            <div class="col-span-full text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhuma lista</h3>
+                <p class="mt-1 text-sm text-gray-500">Comece criando uma nova lista de compras.</p>
+                <div class="mt-6">
+                    <button onclick="openCreateListModal()" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Nova Lista
+                    </button>
+                </div>
             </div>
-        </div>
         {% endif %}
     </div>
 </div>
 
-<!-- Modal Criar Lista -->
+<!-- Modal para criar nova lista -->
 <div id="createListModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
@@ -322,17 +202,17 @@
                 </div>
                 <div>
                     <label for="listDescription" class="block text-sm font-medium text-gray-700">Descrição (opcional)</label>
-                    <textarea id="listDescription" name="description" rows="2"
+                    <textarea id="listDescription" name="description"
                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
                 </div>
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeCreateListModal()"
-                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
                         Cancelar
                     </button>
                     <button type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                        Criar
+                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
+                        Criar Lista
                     </button>
                 </div>
             </form>
@@ -340,7 +220,7 @@
     </div>
 </div>
 
-<!-- Modal Adicionar Item -->
+<!-- Modal para adicionar item -->
 <div id="addItemModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
@@ -369,26 +249,17 @@
                     </select>
                 </div>
                 <div>
-                    <label for="itemPriority" class="block text-sm font-medium text-gray-700">Prioridade</label>
-                    <select id="itemPriority" name="priority" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="LOW">Baixa</option>
-                        <option value="MEDIUM">Média</option>
-                        <option value="HIGH">Alta</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="itemNotes" class="block text-sm font-medium text-gray-700">Observações</label>
-                    <textarea id="itemNotes" name="notes" rows="2"
+                    <label for="itemNotes" class="block text-sm font-medium text-gray-700">Notas (opcional)</label>
+                    <textarea id="itemNotes" name="notes"
                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
                 </div>
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeAddItemModal()"
-                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
                         Cancelar
                     </button>
                     <button type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
                         Adicionar
                     </button>
                 </div>
@@ -396,17 +267,8 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
-    // Adicionar event listeners aos formulários
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('createListForm').addEventListener('submit', createList);
-        document.getElementById('addItemForm').addEventListener('submit', addItem);
-    });
-
-    // Funções para manipular os modais
     function openCreateListModal() {
         document.getElementById('createListModal').classList.remove('hidden');
     }
@@ -424,13 +286,12 @@
         document.getElementById('addItemModal').classList.add('hidden');
     }
 
-    // Funções para manipular as listas e itens
-    async function createList(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
+    document.getElementById('createListForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
         const data = {
             name: formData.get('name'),
-            description: formData.get('description') || ""
+            description: formData.get('description')
         };
 
         try {
@@ -445,22 +306,22 @@
             if (response.ok) {
                 window.location.reload();
             } else {
-                alert('Erro ao criar lista');
+                const errorData = await response.json();
+                alert(`Erro ao criar lista: ${errorData.detail || 'Erro desconhecido'}`);
             }
         } catch (error) {
             console.error('Erro:', error);
             alert('Erro ao criar lista');
         }
-    }
+    });
 
-    async function addItem(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
+    document.getElementById('addItemForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
         const data = {
             name: formData.get('name'),
             quantity: parseInt(formData.get('quantity')),
             category: formData.get('category'),
-            priority: formData.get('priority'),
             notes: formData.get('notes'),
             shopping_list_id: parseInt(formData.get('shopping_list_id'))
         };
@@ -484,7 +345,7 @@
             console.error('Erro:', error);
             alert('Erro ao adicionar item');
         }
-    }
+    });
 
     async function deleteList(listId) {
         if (!confirm('Tem certeza que deseja excluir esta lista?')) return;

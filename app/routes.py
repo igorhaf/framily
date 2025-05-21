@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from fastapi import Depends
 import enum
+from app.schemas.shopping import ShoppingListInDB
 
 templates = Jinja2Templates(directory="templates")
 
@@ -51,20 +52,32 @@ async def health_page(request: Request):
 @pages_router.get("/shopping")
 async def shopping_page(request: Request):
     db = next(deps.get_db())
-    shopping_lists = shopping_list.get_multi(db)
-    # Debug para entender o que está chegando ao template
-    print(f"Total de listas: {len(shopping_lists)}")
+    shopping_lists_db = shopping_list.get_multi(db)
+    shopping_lists = [ShoppingListInDB.model_validate(lst) for lst in shopping_lists_db]
+
+    # Contadores para os cards
+    total_items = 0
+    pending_items = 0
+    bought_items = 0
+
     for lst in shopping_lists:
-        print(f"Lista {lst.id}: {lst.name}")
-        print(f"  Tipo de lst.items: {type(lst.items)}")
-        print(f"  Total de itens: {len(lst.items) if hasattr(lst, 'items') else 0}")
-        if hasattr(lst, 'items') and lst.items:
-            for item in lst.items:
-                print(f"  - Item: {item.name}, Status: {item.status}, Status.name: {item.status.name}")
-    
+        for item in lst.items:
+            total_items += 1
+            if item.status.value == "PENDING":
+                pending_items += 1
+            elif item.status.value == "BOUGHT":
+                bought_items += 1
+
     return templates.TemplateResponse(
         "shopping.html",
-        {"request": request, "title": "Shopping", "shopping_lists": shopping_lists}
+        {
+            "request": request,
+            "title": "Shopping",
+            "shopping_lists": shopping_lists,
+            "total_items": total_items,
+            "pending_items": pending_items,
+            "bought_items": bought_items,
+        }
     )
 
 @pages_router.get("/shopping_debug", response_class=HTMLResponse)
