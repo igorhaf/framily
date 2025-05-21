@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import deps
 import logging
+import traceback
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -18,14 +19,23 @@ def read_tasks(
     Retrieve tasks.
     """
     try:
+        logger.info("Iniciando busca de tarefas...")
+        logger.info(f"Parâmetros: skip={skip}, limit={limit}")
+        
         tasks = crud.task.get_multi(db, skip=skip, limit=limit)
-        logger.info(f"Retrieved {len(tasks)} tasks")
+        logger.info(f"Tarefas encontradas: {len(tasks)}")
+        
+        # Log das tarefas encontradas
+        for task in tasks:
+            logger.info(f"Tarefa ID: {task.id}, Título: {task.title}, Status: {task.status}")
+        
         return tasks
     except Exception as e:
-        logger.error(f"Error retrieving tasks: {str(e)}")
+        logger.error(f"Erro ao buscar tarefas: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(
             status_code=500,
-            detail="Internal server error while retrieving tasks"
+            detail=f"Internal server error while retrieving tasks: {str(e)}"
         )
 
 @router.post("/", response_model=schemas.Task)

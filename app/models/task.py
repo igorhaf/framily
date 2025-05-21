@@ -15,8 +15,8 @@ class Task(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Foreign Keys
-    family_id = Column(Integer, ForeignKey("families.id"))
+    # Foreign Keys - tornando opcionais
+    family_id = Column(Integer, ForeignKey("families.id"), nullable=True)
     family_member_id = Column(Integer, ForeignKey("family_members.id"), nullable=True)
     
     # Relationships

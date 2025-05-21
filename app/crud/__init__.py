@@ -1,9 +1,13 @@
-from .crud_task import Task
-from .base import CRUDBase
-from app.models.task import Task as TaskModel
-from app.schemas.task import TaskCreate, TaskUpdate
-from app.crud.crud_shopping import shopping_list, shopping_item
+from .crud_task import get, get_multi, get_multi_by_family, create, update, delete
+from .crud_shopping import shopping_list, shopping_item
 
-task = CRUDBase[TaskModel, TaskCreate, TaskUpdate](TaskModel)
+task = type('Task', (), {
+    'get': get,
+    'get_multi': get_multi,
+    'get_multi_by_family': get_multi_by_family,
+    'create': create,
+    'update': update,
+    'delete': delete
+})
 
 __all__ = ["task", "shopping_list", "shopping_item"] 

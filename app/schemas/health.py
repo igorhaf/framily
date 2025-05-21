@@ -12,7 +12,7 @@ class HealthAppointmentBase(BaseModel):
     specialty: str
     location: Optional[str] = None
     notes: Optional[str] = None
-    status: str = "agendado"
+    status: Optional[str] = "agendado"
 
 class HealthAppointmentCreate(HealthAppointmentBase):
     pass
@@ -33,7 +33,7 @@ class HealthMedicationBase(BaseModel):
     frequency: str
     start_date: date
     end_date: Optional[date] = None
-    status: MedicationStatus = MedicationStatus.ATIVO
+    status: Optional[MedicationStatus] = MedicationStatus.ATIVO
     notes: Optional[str] = None
 
 class HealthMedicationCreate(HealthMedicationBase):
@@ -56,7 +56,7 @@ class HealthExamBase(BaseModel):
     doctor: Optional[str] = None
     notes: Optional[str] = None
     result: Optional[str] = None
-    status: str = "agendado"
+    status: Optional[str] = "agendado"
 
 class HealthExamCreate(HealthExamBase):
     pass

@@ -8,6 +8,7 @@ sys.path.append(root_dir)
 
 import requests
 import json
+import traceback
 
 def test_tasks_error():
     print("Iniciando testes de erro de tarefas...")
@@ -29,6 +30,7 @@ def test_tasks_error():
             print("Resposta:", response.text)
     except Exception as e:
         print(f"❌ Erro ao testar tarefas: {str(e)}")
+        print("Traceback:", traceback.format_exc())
 
 if __name__ == "__main__":
     test_tasks_error() 
