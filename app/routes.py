@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from fastapi import Depends
 import enum
 from app.schemas.shopping import ShoppingListInDB
+from app.schemas.education import EducationEventInDB, EducationExpenseInDB
 
 templates = Jinja2Templates(directory="templates")
 
@@ -104,14 +105,18 @@ async def education_page(request: Request):
     db = next(deps.get_db())
     institutions = education_institution.get_multi(db)
     events = sorted(education_event.get_multi(db), key=lambda e: e.data_hora)
+    # Converter eventos para schema Pydantic
+    events_schema = [EducationEventInDB.model_validate(event) for event in events]
     expenses = sorted(education_expense.get_multi(db), key=lambda e: e.data, reverse=True)
+    # Converter despesas para schema Pydantic
+    expenses_schema = [EducationExpenseInDB.model_validate(expense) for expense in expenses]
     return templates.TemplateResponse(
         "education.html",
         {
             "request": request,
             "title": "Educação",
             "institutions": institutions,
-            "events": events,
-            "expenses": expenses,
+            "events": events_schema,
+            "expenses": expenses_schema,
         }
     ) 

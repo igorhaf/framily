@@ -6,36 +6,22 @@
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Painel de Educação</h1>
 
-    <!-- Linha do Tempo de Eventos -->
-    <div class="bg-white rounded-lg shadow p-6 mb-8">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4">Linha do Tempo de Eventos</h3>
-        {% if events %}
-            <ul class="divide-y divide-gray-200">
-                {% for event in events %}
-                <li class="py-3 flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div>
-                        <span class="font-bold">{{ event.titulo }}</span>
-                        <span class="text-gray-500 ml-2">({{ event.tipo.value if event.tipo is defined and event.tipo is not none and event.tipo is not string else event.tipo|default('') }})</span>
-                        <div class="text-sm text-gray-500">{{ event.descricao|default('') }}</div>
-                        <div class="text-xs text-gray-400">
-                            {% if event.data_hora is defined and event.data_hora %}
-                                {{ event.data_hora.strftime('%d/%m/%Y %H:%M') }}
-                            {% endif %}
-                        </div>
-                        {% if event.instituicao is defined and event.instituicao and event.instituicao.nome %}
-                        <div class="text-xs text-blue-700">{{ event.instituicao.nome }}</div>
-                        {% endif %}
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-gray-500">Nenhum evento cadastrado.</p>
-        {% endif %}
+    <div class="flex flex-col md:flex-row gap-6">
+        <!-- Calendário Visual de Educação -->
+        <div class="bg-white rounded-lg shadow p-6 w-full md:w-1/2">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Calendário de Eventos Educacionais</h3>
+            <div id="calendar-edu"></div>
+        </div>
+
+        <!-- Lista de Eventos -->
+        <div class="bg-white rounded-lg shadow p-6 w-full md:w-1/2">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Eventos</h3>
+            <div id="event-list-edu"></div>
+        </div>
     </div>
 
     <!-- Despesas Educacionais -->
-    <div class="bg-white rounded-lg shadow p-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6 mt-6">
         <h3 class="text-lg font-semibold text-gray-700 mb-4">Despesas Educacionais</h3>
         {% if expenses %}
             <table class="min-w-full divide-y divide-gray-200">
@@ -57,7 +43,7 @@
                                 {{ expense.data.strftime('%d/%m/%Y') }}
                             {% endif %}
                         </td>
-                        <td class="px-4 py-2">{{ expense.categoria.value if expense.categoria is defined and expense.categoria is not none and expense.categoria is not string else expense.categoria|default('') }}</td>
+                        <td class="px-4 py-2">{{ expense.categoria.value }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -66,25 +52,150 @@
             <p class="text-gray-500">Nenhuma despesa cadastrada.</p>
         {% endif %}
     </div>
-
-    <!-- Instituições e Cursos -->
-    <div class="bg-white rounded-lg shadow p-6 mb-8">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4">Instituições e Cursos</h3>
-        {% if institutions %}
-            <ul class="divide-y divide-gray-200">
-                {% for inst in institutions %}
-                <li class="py-3">
-                    <span class="font-bold">{{ inst.nome|default('') }}</span>
-                    <span class="text-gray-500 ml-2">({{ inst.tipo.value if inst.tipo is defined and inst.tipo is not none and inst.tipo is not string else inst.tipo|default('') }})</span>
-                    {% if inst.descricao %}
-                        <div class="text-sm text-gray-500">{{ inst.descricao }}</div>
-                    {% endif %}
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-gray-500">Nenhuma instituição cadastrada.</p>
-        {% endif %}
-    </div>
 </div>
+
+<script>
+(function() {
+    // Eventos vindos do backend
+    const events = [
+        {% for event in events %}
+        {
+            date: "{{ event.data_hora.strftime('%Y-%m-%d') if event.data_hora is defined and event.data_hora else '' }}",
+            time: "{{ event.data_hora.strftime('%H:%M') if event.data_hora is defined and event.data_hora else '' }}",
+            title: `{{ event.titulo|e }}`,
+            type: `{{ event.tipo.value }}`,
+            institution: `{{ event.instituicao.nome if event.instituicao is defined and event.instituicao and event.instituicao.nome else '' }}`,
+            desc: `{{ event.descricao|e|default('') }}`
+        },
+        {% endfor %}
+    ];
+
+    // Utilitário para obter o primeiro dia do mês e o último
+    function getMonthDays(year, month) {
+        const first = new Date(year, month, 1);
+        const last = new Date(year, month + 1, 0);
+        return { first, last };
+    }
+
+    // Estado do calendário
+    let today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
+    let selectedDate = null;
+
+    function renderCalendar() {
+        const { first, last } = getMonthDays(currentYear, currentMonth);
+        const calendar = document.getElementById('calendar-edu');
+        calendar.innerHTML = '';
+        // Cabeçalho
+        const header = document.createElement('div');
+        header.className = 'flex justify-between items-center mb-2';
+        header.innerHTML = `
+            <button id="prevMonthEdu" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">&#8592;</button>
+            <span class="font-bold">${first.toLocaleString('pt-BR', { month: 'long' })} ${currentYear}</span>
+            <button id="nextMonthEdu" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">&#8594;</button>
+        `;
+        calendar.appendChild(header);
+        // Dias da semana
+        const daysRow = document.createElement('div');
+        daysRow.className = 'grid grid-cols-7 text-center text-xs text-gray-500 mb-1';
+        ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d => {
+            const el = document.createElement('div');
+            el.textContent = d;
+            daysRow.appendChild(el);
+        });
+        calendar.appendChild(daysRow);
+        // Grid de dias
+        const grid = document.createElement('div');
+        grid.className = 'grid grid-cols-7 text-center';
+        // Dias vazios antes do primeiro dia
+        for(let i=0; i<first.getDay(); i++) {
+            grid.appendChild(document.createElement('div'));
+        }
+        // Dias do mês
+        for(let d=1; d<=last.getDate(); d++) {
+            const day = new Date(currentYear, currentMonth, d);
+            const dayStr = day.toISOString().slice(0,10);
+            const hasEvent = events.some(ev => ev.date === dayStr);
+            const cell = document.createElement('button');
+            cell.className = 'w-8 h-8 rounded-full mb-1 ' + 
+                (hasEvent ? 'bg-blue-200 text-blue-900 font-bold border border-blue-400' : 'hover:bg-gray-100') +
+                (selectedDate === dayStr ? ' ring-2 ring-blue-500' : '');
+            cell.textContent = d;
+            cell.dataset.date = dayStr;
+            if (hasEvent) {
+                cell.title = 'Clique para ver eventos';
+            }
+            cell.onclick = function() {
+                selectedDate = dayStr;
+                showEventsForDate(dayStr);
+                renderCalendar(); // Re-render para atualizar o highlight
+            };
+            grid.appendChild(cell);
+        }
+        calendar.appendChild(grid);
+        // Navegação
+        document.getElementById('prevMonthEdu').onclick = function() {
+            currentMonth--;
+            if(currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderCalendar();
+        };
+        document.getElementById('nextMonthEdu').onclick = function() {
+            currentMonth++;
+            if(currentMonth > 11) { currentMonth = 0; currentYear++; }
+            renderCalendar();
+        };
+    }
+
+    function showEventsForDate(dateStr) {
+        const list = document.getElementById('event-list-edu');
+        const dayEvents = events.filter(ev => ev.date === dateStr);
+        
+        if(dayEvents.length === 0) {
+            // Se não há eventos no dia selecionado, mostra os próximos 5 eventos
+            const today = new Date().toISOString().slice(0,10);
+            const futureEvents = events
+                .filter(ev => ev.date >= today)
+                .sort((a, b) => a.date.localeCompare(b.date))
+                .slice(0, 5);
+            
+            if(futureEvents.length === 0) {
+                list.innerHTML = '<p class="text-gray-500">Nenhum evento cadastrado.</p>';
+                return;
+            }
+
+            let html = '<div class="mb-2 font-bold text-blue-700">Próximos Eventos</div>';
+            html += '<ul class="space-y-2">';
+            futureEvents.forEach(ev => {
+                html += `<li class="p-3 bg-blue-50 rounded shadow">
+                    <div class="font-bold">${ev.title} <span class="text-xs text-gray-500">(${ev.type})</span></div>
+                    <div class="text-sm text-green-700">${ev.institution}</div>
+                    <div class="text-xs text-gray-400">${ev.date.split('-').reverse().join('/')} ${ev.time}</div>
+                    <div class="text-xs text-gray-500">${ev.desc}</div>
+                </li>`;
+            });
+            html += '</ul>';
+            list.innerHTML = html;
+            return;
+        }
+
+        let html = `<div class="mb-2 font-bold text-blue-700">Eventos em ${dateStr.split('-').reverse().join('/')}</div>`;
+        html += '<ul class="space-y-2">';
+        dayEvents.forEach(ev => {
+            html += `<li class="p-3 bg-blue-50 rounded shadow">
+                <div class="font-bold">${ev.title} <span class="text-xs text-gray-500">(${ev.type})</span></div>
+                <div class="text-sm text-green-700">${ev.institution}</div>
+                <div class="text-xs text-gray-400">${ev.time}</div>
+                <div class="text-xs text-gray-500">${ev.desc}</div>
+            </li>`;
+        });
+        html += '</ul>';
+        list.innerHTML = html;
+    }
+
+    renderCalendar();
+    // Exibe próximos eventos ao carregar
+    showEventsForDate(null);
+})();
+</script>
 {% endblock %} 
