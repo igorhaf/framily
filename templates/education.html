@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Educação{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Painel de Educação</h1>
+
+    <!-- Linha do Tempo de Eventos -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Linha do Tempo de Eventos</h3>
+        {% if events %}
+            <ul class="divide-y divide-gray-200">
+                {% for event in events %}
+                <li class="py-3 flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <span class="font-bold">{{ event.titulo }}</span>
+                        <span class="text-gray-500 ml-2">({{ event.tipo.value if event.tipo is defined and event.tipo is not none and event.tipo is not string else event.tipo|default('') }})</span>
+                        <div class="text-sm text-gray-500">{{ event.descricao|default('') }}</div>
+                        <div class="text-xs text-gray-400">
+                            {% if event.data_hora is defined and event.data_hora %}
+                                {{ event.data_hora.strftime('%d/%m/%Y %H:%M') }}
+                            {% endif %}
+                        </div>
+                        {% if event.instituicao is defined and event.instituicao and event.instituicao.nome %}
+                        <div class="text-xs text-blue-700">{{ event.instituicao.nome }}</div>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500">Nenhum evento cadastrado.</p>
+        {% endif %}
+    </div>
+
+    <!-- Despesas Educacionais -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Despesas Educacionais</h3>
+        {% if expenses %}
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2 text-left">Descrição</th>
+                        <th class="px-4 py-2 text-left">Valor</th>
+                        <th class="px-4 py-2 text-left">Data</th>
+                        <th class="px-4 py-2 text-left">Categoria</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    {% for expense in expenses %}
+                    <tr>
+                        <td class="px-4 py-2">{{ expense.descricao|default('') }}</td>
+                        <td class="px-4 py-2">R$ {{ '%.2f'|format(expense.valor|default(0)) }}</td>
+                        <td class="px-4 py-2">
+                            {% if expense.data is defined and expense.data %}
+                                {{ expense.data.strftime('%d/%m/%Y') }}
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-2">{{ expense.categoria.value if expense.categoria is defined and expense.categoria is not none and expense.categoria is not string else expense.categoria|default('') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-gray-500">Nenhuma despesa cadastrada.</p>
+        {% endif %}
+    </div>
+
+    <!-- Instituições e Cursos -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Instituições e Cursos</h3>
+        {% if institutions %}
+            <ul class="divide-y divide-gray-200">
+                {% for inst in institutions %}
+                <li class="py-3">
+                    <span class="font-bold">{{ inst.nome|default('') }}</span>
+                    <span class="text-gray-500 ml-2">({{ inst.tipo.value if inst.tipo is defined and inst.tipo is not none and inst.tipo is not string else inst.tipo|default('') }})</span>
+                    {% if inst.descricao %}
+                        <div class="text-sm text-gray-500">{{ inst.descricao }}</div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500">Nenhuma instituição cadastrada.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

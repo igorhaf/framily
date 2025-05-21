@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 from app.api import deps
 from app.crud import shopping_list
+from app.crud.crud_education import education_institution, education_event, education_expense
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from fastapi import Depends
@@ -96,4 +97,21 @@ async def shopping_test(request: Request, db: Session = Depends(deps.get_db)):
     return templates.TemplateResponse(
         "shopping_test.html",
         {"request": request, "shopping_lists": lists}
+    )
+
+@pages_router.get("/education")
+async def education_page(request: Request):
+    db = next(deps.get_db())
+    institutions = education_institution.get_multi(db)
+    events = sorted(education_event.get_multi(db), key=lambda e: e.data_hora)
+    expenses = sorted(education_expense.get_multi(db), key=lambda e: e.data, reverse=True)
+    return templates.TemplateResponse(
+        "education.html",
+        {
+            "request": request,
+            "title": "Educação",
+            "institutions": institutions,
+            "events": events,
+            "expenses": expenses,
+        }
     ) 

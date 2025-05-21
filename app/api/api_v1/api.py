@@ -5,6 +5,7 @@ from app.api.api_v1.endpoints.health import router as health_router
 from app.api.api_v1.endpoints.calendar import router as calendar_router
 from app.api.api_v1.endpoints.whatsapp import router as whatsapp_router
 from app.api.api_v1.endpoints.shopping import router as shopping_router
+from app.api.api_v1.endpoints import education
 
 api_router = APIRouter()
 
@@ -24,4 +25,7 @@ api_router.include_router(calendar_router, prefix="/calendar", tags=["calendar"]
 api_router.include_router(whatsapp_router, prefix="/whatsapp", tags=["whatsapp"])
 
 # Shopping management
-api_router.include_router(shopping_router, prefix="/shopping", tags=["shopping"]) 
+api_router.include_router(shopping_router, prefix="/shopping", tags=["shopping"])
+
+# Education management
+api_router.include_router(education.router, prefix="/education", tags=["Educação"]) 
