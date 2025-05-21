@@ -4,53 +4,112 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">Painel de Educação</h1>
-
-    <div class="flex flex-col md:flex-row gap-6">
-        <!-- Calendário Visual de Educação -->
-        <div class="bg-white rounded-lg shadow p-6 w-full md:w-1/2">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4">Calendário de Eventos Educacionais</h3>
-            <div id="calendar-edu"></div>
-        </div>
-
-        <!-- Lista de Eventos -->
-        <div class="bg-white rounded-lg shadow p-6 w-full md:w-1/2">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4">Eventos</h3>
-            <div id="event-list-edu"></div>
-        </div>
+    <!-- Loading Indicator -->
+    <div id="loading" class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
     </div>
 
-    <!-- Despesas Educacionais -->
-    <div class="bg-white rounded-lg shadow p-6 mt-6">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4">Despesas Educacionais</h3>
-        {% if expenses %}
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-4 py-2 text-left">Descrição</th>
-                        <th class="px-4 py-2 text-left">Valor</th>
-                        <th class="px-4 py-2 text-left">Data</th>
-                        <th class="px-4 py-2 text-left">Categoria</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 bg-white">
-                    {% for expense in expenses %}
-                    <tr>
-                        <td class="px-4 py-2">{{ expense.descricao|default('') }}</td>
-                        <td class="px-4 py-2">R$ {{ '%.2f'|format(expense.valor|default(0)) }}</td>
-                        <td class="px-4 py-2">
-                            {% if expense.data is defined and expense.data %}
-                                {{ expense.data.strftime('%d/%m/%Y') }}
-                            {% endif %}
-                        </td>
-                        <td class="px-4 py-2">{{ expense.categoria.value }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p class="text-gray-500">Nenhuma despesa cadastrada.</p>
-        {% endif %}
+    <!-- Error Message -->
+    <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <span class="block sm:inline"></span>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div id="dashboard-content">
+        <!-- Legenda -->
+        <div class="bg-white rounded-lg shadow p-4 mb-8">
+            <h4 class="text-sm font-medium text-gray-900 mb-3">Legenda</h4>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-blue-50 rounded mr-2"></div>
+                    <span class="text-sm text-gray-600">Eventos</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-red-50 rounded mr-2"></div>
+                    <span class="text-sm text-gray-600">Eventos Importantes</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-green-50 rounded mr-2"></div>
+                    <span class="text-sm text-gray-600">Eventos Recorrentes</span>
+                </div>
+            </div>
+        </div>
+        <!-- Layout Principal -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <!-- Calendário (2/3) -->
+            <div class="col-span-1 lg:col-span-2 bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900" id="calendar-edu-title">Calendário de Eventos</h3>
+                        <div class="flex space-x-2">
+                            <button id="prevMonthEdu" class="p-2 rounded-full hover:bg-gray-100">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
+                            <button id="nextMonthEdu" class="p-2 rounded-full hover:bg-gray-100">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div id="calendar-edu" class="grid grid-cols-7 gap-2"></div>
+                </div>
+            </div>
+            <!-- Eventos do Dia (1/3) -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900" id="eventsTitleEdu">Próximos Eventos</h3>
+                </div>
+                <div class="p-6">
+                    <div id="event-list-edu" class="space-y-4">
+                        <div class="text-center text-gray-500">Carregando eventos...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Despesas Educacionais -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Despesas Educacionais</h3>
+            </div>
+            <div class="p-6">
+                {% if expenses %}
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for expense in expenses %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.descricao|default('') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">R$ {{ '%.2f'|format(expense.valor|default(0)) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        {% if expense.data is defined and expense.data %}
+                                            {{ expense.data.strftime('%d/%m/%Y') }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.categoria.value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-gray-500 text-center py-4">Nenhuma despesa cadastrada.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -70,132 +129,220 @@
         {% endfor %}
     ];
 
-    // Utilitário para obter o primeiro dia do mês e o último
-    function getMonthDays(year, month) {
-        const first = new Date(year, month, 1);
-        const last = new Date(year, month + 1, 0);
-        return { first, last };
-    }
-
     // Estado do calendário
     let today = new Date();
     let currentMonth = today.getMonth();
     let currentYear = today.getFullYear();
     let selectedDate = null;
 
-    function renderCalendar() {
-        const { first, last } = getMonthDays(currentYear, currentMonth);
-        const calendar = document.getElementById('calendar-edu');
-        calendar.innerHTML = '';
-        // Cabeçalho
-        const header = document.createElement('div');
-        header.className = 'flex justify-between items-center mb-2';
-        header.innerHTML = `
-            <button id="prevMonthEdu" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">&#8592;</button>
-            <span class="font-bold">${first.toLocaleString('pt-BR', { month: 'long' })} ${currentYear}</span>
-            <button id="nextMonthEdu" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">&#8594;</button>
-        `;
-        calendar.appendChild(header);
-        // Dias da semana
-        const daysRow = document.createElement('div');
-        daysRow.className = 'grid grid-cols-7 text-center text-xs text-gray-500 mb-1';
-        ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d => {
-            const el = document.createElement('div');
-            el.textContent = d;
-            daysRow.appendChild(el);
-        });
-        calendar.appendChild(daysRow);
-        // Grid de dias
-        const grid = document.createElement('div');
-        grid.className = 'grid grid-cols-7 text-center';
-        // Dias vazios antes do primeiro dia
-        for(let i=0; i<first.getDay(); i++) {
-            grid.appendChild(document.createElement('div'));
-        }
-        // Dias do mês
-        for(let d=1; d<=last.getDate(); d++) {
-            const day = new Date(currentYear, currentMonth, d);
-            const dayStr = day.toISOString().slice(0,10);
-            const hasEvent = events.some(ev => ev.date === dayStr);
-            const cell = document.createElement('button');
-            cell.className = 'w-8 h-8 rounded-full mb-1 ' + 
-                (hasEvent ? 'bg-blue-200 text-blue-900 font-bold border border-blue-400' : 'hover:bg-gray-100') +
-                (selectedDate === dayStr ? ' ring-2 ring-blue-500' : '');
-            cell.textContent = d;
-            cell.dataset.date = dayStr;
-            if (hasEvent) {
-                cell.title = 'Clique para ver eventos';
-            }
-            cell.onclick = function() {
-                selectedDate = dayStr;
-                showEventsForDate(dayStr);
-                renderCalendar(); // Re-render para atualizar o highlight
-            };
-            grid.appendChild(cell);
-        }
-        calendar.appendChild(grid);
-        // Navegação
-        document.getElementById('prevMonthEdu').onclick = function() {
-            currentMonth--;
-            if(currentMonth < 0) { currentMonth = 11; currentYear--; }
-            renderCalendar();
-        };
-        document.getElementById('nextMonthEdu').onclick = function() {
-            currentMonth++;
-            if(currentMonth > 11) { currentMonth = 0; currentYear++; }
-            renderCalendar();
-        };
+    // Atualizar o título do calendário
+    function updateCalendarTitle() {
+        const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                           'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        document.getElementById('calendar-edu-title').textContent = 
+            `Calendário de Eventos - ${monthNames[currentMonth]} ${currentYear}`;
     }
 
-    function showEventsForDate(dateStr) {
-        const list = document.getElementById('event-list-edu');
-        const dayEvents = events.filter(ev => ev.date === dateStr);
+    // Gerar o calendário
+    function renderCalendar() {
+        const calendarContainer = document.getElementById('calendar-edu');
+        calendarContainer.innerHTML = '';
         
-        if(dayEvents.length === 0) {
-            // Se não há eventos no dia selecionado, mostra os próximos 5 eventos
-            const today = new Date().toISOString().slice(0,10);
-            const futureEvents = events
-                .filter(ev => ev.date >= today)
+        // Adicionar dias da semana
+        const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        weekdays.forEach(day => {
+            const dayEl = document.createElement('div');
+            dayEl.className = 'text-center font-medium text-gray-500';
+            dayEl.textContent = day;
+            calendarContainer.appendChild(dayEl);
+        });
+        
+        // Primeiro dia do mês
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        
+        // Último dia do mês
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        
+        // Dia da semana do primeiro dia (0 = Domingo, 6 = Sábado)
+        const firstDayOfWeek = firstDay.getDay();
+        
+        // Número total de dias no mês
+        const daysInMonth = lastDay.getDate();
+        
+        // Adicionar espaços vazios para os dias antes do primeiro dia do mês
+        for (let i = 0; i < firstDayOfWeek; i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'h-24';
+            calendarContainer.appendChild(emptyDay);
+        }
+        
+        // Adicionar os dias do mês
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(currentYear, currentMonth, day);
+            const dateString = date.toISOString().split('T')[0];
+            
+            // Verificar se existem eventos neste dia
+            const dayEvents = events.filter(event => event.date === dateString);
+            
+            // Determinar a cor de fundo baseada no tipo de evento
+            let bgColor = 'bg-white';
+            if (dayEvents.length > 0) {
+                bgColor = 'bg-blue-50';
+            }
+            
+            // Verificar se é o dia atual ou selecionado
+            const isToday = date.toDateString() === new Date().toDateString();
+            const isSelected = selectedDate && dateString === selectedDate;
+            
+            // Criar o elemento do dia
+            const dayEl = document.createElement('div');
+            dayEl.className = `h-24 p-2 ${bgColor} rounded-lg relative cursor-pointer hover:bg-gray-50 ${
+                isToday ? 'ring-2 ring-blue-500' : ''
+            } ${
+                isSelected ? 'ring-2 ring-blue-600' : ''
+            }`;
+            dayEl.onclick = function() {
+                selectedDate = dateString;
+                showEventsForDate(dateString);
+                renderCalendar(); // Re-render para atualizar o highlight
+            };
+            
+            // Adicionar o número do dia
+            const dayNum = document.createElement('span');
+            dayNum.className = 'text-sm font-medium';
+            dayNum.textContent = day;
+            dayEl.appendChild(dayNum);
+            
+            // Adicionar indicador de eventos se existirem
+            if (dayEvents.length > 0) {
+                const eventIndicator = document.createElement('div');
+                eventIndicator.className = 'mt-1';
+                eventIndicator.innerHTML = `
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                        ${dayEvents.length} evento${dayEvents.length > 1 ? 's' : ''}
+                    </span>
+                `;
+                dayEl.appendChild(eventIndicator);
+            }
+            
+            calendarContainer.appendChild(dayEl);
+        }
+        
+        // Atualizar o título do calendário
+        updateCalendarTitle();
+    }
+
+    // Função para exibir eventos de uma data específica
+    function showEventsForDate(dateStr) {
+        const eventList = document.getElementById('event-list-edu');
+        const eventsTitle = document.getElementById('eventsTitleEdu');
+        
+        if (dateStr) {
+            // Exibir eventos do dia selecionado
+            const selectedEvents = events.filter(event => event.date === dateStr);
+            
+            if (selectedEvents.length === 0) {
+                eventList.innerHTML = '<p class="text-center text-gray-500">Nenhum evento nesta data.</p>';
+                eventsTitle.textContent = `Eventos em ${dateStr.split('-').reverse().join('/')}`;
+                return;
+            }
+            
+            eventsTitle.textContent = `Eventos em ${dateStr.split('-').reverse().join('/')}`;
+            
+            let html = '<div class="space-y-4">';
+            selectedEvents.forEach(event => {
+                html += `
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <div class="font-medium text-blue-700">${event.title} ${event.time}</div>
+                    <div class="text-sm text-gray-600 mt-1">${event.desc}</div>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            ${event.type}
+                        </span>
+                        ${event.institution ? `
+                        <span class="text-sm text-gray-600 flex items-center">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            ${event.institution}
+                        </span>
+                        ` : ''}
+                    </div>
+                </div>
+                `;
+            });
+            html += '</div>';
+            eventList.innerHTML = html;
+        } else {
+            // Exibir próximos eventos
+            const today = new Date().toISOString().split('T')[0];
+            const upcomingEvents = events
+                .filter(event => event.date >= today)
                 .sort((a, b) => a.date.localeCompare(b.date))
                 .slice(0, 5);
             
-            if(futureEvents.length === 0) {
-                list.innerHTML = '<p class="text-gray-500">Nenhum evento cadastrado.</p>';
+            eventsTitle.textContent = 'Próximos Eventos';
+            
+            if (upcomingEvents.length === 0) {
+                eventList.innerHTML = '<p class="text-center text-gray-500">Nenhum evento futuro encontrado.</p>';
                 return;
             }
-
-            let html = '<div class="mb-2 font-bold text-blue-700">Próximos Eventos</div>';
-            html += '<ul class="space-y-2">';
-            futureEvents.forEach(ev => {
-                html += `<li class="p-3 bg-blue-50 rounded shadow">
-                    <div class="font-bold">${ev.title} <span class="text-xs text-gray-500">(${ev.type})</span></div>
-                    <div class="text-sm text-green-700">${ev.institution}</div>
-                    <div class="text-xs text-gray-400">${ev.date.split('-').reverse().join('/')} ${ev.time}</div>
-                    <div class="text-xs text-gray-500">${ev.desc}</div>
-                </li>`;
+            
+            let html = '<div class="space-y-4">';
+            upcomingEvents.forEach(event => {
+                html += `
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <div class="font-medium text-blue-700">${event.title}</div>
+                    <div class="text-sm text-gray-500 mt-0.5">${event.date.split('-').reverse().join('/')} ${event.time}</div>
+                    <div class="text-sm text-gray-600 mt-1">${event.desc}</div>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            ${event.type}
+                        </span>
+                        ${event.institution ? `
+                        <span class="text-sm text-gray-600 flex items-center">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            ${event.institution}
+                        </span>
+                        ` : ''}
+                    </div>
+                </div>
+                `;
             });
-            html += '</ul>';
-            list.innerHTML = html;
-            return;
+            html += '</div>';
+            eventList.innerHTML = html;
         }
-
-        let html = `<div class="mb-2 font-bold text-blue-700">Eventos em ${dateStr.split('-').reverse().join('/')}</div>`;
-        html += '<ul class="space-y-2">';
-        dayEvents.forEach(ev => {
-            html += `<li class="p-3 bg-blue-50 rounded shadow">
-                <div class="font-bold">${ev.title} <span class="text-xs text-gray-500">(${ev.type})</span></div>
-                <div class="text-sm text-green-700">${ev.institution}</div>
-                <div class="text-xs text-gray-400">${ev.time}</div>
-                <div class="text-xs text-gray-500">${ev.desc}</div>
-            </li>`;
-        });
-        html += '</ul>';
-        list.innerHTML = html;
     }
 
+    // Configurar navegação do calendário
+    document.getElementById('prevMonthEdu').addEventListener('click', function() {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalendar();
+    });
+
+    document.getElementById('nextMonthEdu').addEventListener('click', function() {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar();
+    });
+
+    // Inicialização
     renderCalendar();
-    // Exibe próximos eventos ao carregar
     showEventsForDate(null);
 })();
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('dashboard-content').classList.remove('hidden');
+});
 </script>
 {% endblock %} 
