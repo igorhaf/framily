@@ -119,4 +119,9 @@ async def education_page(request: Request):
             "events": events_schema,
             "expenses": expenses_schema,
         }
-    ) 
+    )
+
+# Update the login_page route to include the request parameter
+@pages_router.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request}) 
