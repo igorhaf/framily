@@ -4,6 +4,7 @@ from typing import List
 from app.api import deps
 from app import crud
 from app.schemas.education import *
+import logging
 
 router = APIRouter()
 
@@ -19,7 +20,11 @@ def create_institution(obj_in: EducationInstitutionCreate, db: Session = Depends
 # Eventos
 @router.get("/events/", response_model=List[EducationEventInDB])
 def list_events(db: Session = Depends(deps.get_db)):
-    return crud.education_event.get_multi(db)
+    try:
+        return crud.education_event.get_multi(db)
+    except Exception as e:
+        logging.exception("Erro ao buscar eventos de educação")
+        raise HTTPException(status_code=500, detail=f"Erro interno ao buscar eventos de educação: {str(e)}")
 
 @router.post("/events/", response_model=EducationEventInDB)
 def create_event(obj_in: EducationEventCreate, db: Session = Depends(deps.get_db)):
