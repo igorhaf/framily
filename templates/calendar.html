@@ -146,8 +146,8 @@
             
             // Filtra os eventos para este dia
             const dayEvents = events.filter(event => {
-                if (!event.start_date) return false;
-                const eventDate = new Date(event.start_date).toISOString().split('T')[0];
+                if (!event.start_date && !event.due_date) return false;
+                const eventDate = event.start_date ? new Date(event.start_date).toISOString().split('T')[0] : new Date(event.due_date).toISOString().split('T')[0];
                 return eventDate === dateString;
             });
             
@@ -279,8 +279,8 @@
     function selectDate(dateString) {
         selectedDate = new Date(dateString);
         const dayEvents = events.filter(event => {
-            if (!event.start_date) return false;
-            const eventDate = new Date(event.start_date).toISOString().split('T')[0];
+            if (!event.start_date && !event.due_date) return false;
+            const eventDate = event.start_date ? new Date(event.start_date).toISOString().split('T')[0] : new Date(event.due_date).toISOString().split('T')[0];
             return eventDate === dateString;
         });
 
@@ -344,7 +344,7 @@
         generateCalendar();
     }
 
-    // Função para carregar os eventos
+    // Função para carregar os eventos e tarefas
     async function loadEvents() {
         try {
             // Calcular datas para o mês atual
@@ -360,18 +360,44 @@
                     String(date.getDate()).padStart(2, '0');
             }
 
-            const url = `/api/v1/calendar/events/?start_date=${formatDate(start)}&end_date=${formatDate(end)}`;
-            console.log('Buscando eventos na URL:', url);
+            const eventsUrl = `/api/v1/calendar/events/?start_date=${formatDate(start)}&end_date=${formatDate(end)}`;
+            const tasksUrl = `/api/v1/tasks/`;
 
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Erro HTTP! status: ${response.status}`);
+            console.log('Buscando eventos na URL:', eventsUrl);
+            console.log('Buscando tarefas na URL:', tasksUrl);
+
+            const [eventsResponse, tasksResponse] = await Promise.all([
+                fetch(eventsUrl),
+                fetch(tasksUrl)
+            ]);
+
+            if (!eventsResponse.ok) {
+                throw new Error(`Erro HTTP ao buscar eventos! status: ${eventsResponse.status}`);
             }
-            events = await response.json();
-            
-            if (!Array.isArray(events)) {
+            if (!tasksResponse.ok) {
+                throw new Error(`Erro HTTP ao buscar tarefas! status: ${tasksResponse.status}`);
+            }
+
+            const eventsData = await eventsResponse.json();
+            const tasksData = await tasksResponse.json();
+
+            if (!Array.isArray(eventsData)) {
                 throw new Error('Esperava que os eventos fossem um array');
             }
+            if (!Array.isArray(tasksData)) {
+                throw new Error('Esperava que as tarefas fossem um array');
+            }
+
+            // Combina eventos e tarefas
+            events = [
+                ...eventsData,
+                ...tasksData.map(task => ({
+                    title: task.title,
+                    start_date: task.due_date,
+                    event_type: 'task',
+                    description: task.description
+                }))
+            ];
 
             // Gera o calendário
             generateCalendar();
@@ -380,8 +406,8 @@
             showNextEvents();
             
         } catch (error) {
-            console.error('Erro ao carregar eventos:', error);
-            showError(`Erro ao carregar eventos: ${error.message}`);
+            console.error('Erro ao carregar eventos e tarefas:', error);
+            showError(`Erro ao carregar eventos e tarefas: ${error.message}`);
         }
     }
 
