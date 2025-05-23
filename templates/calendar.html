@@ -344,7 +344,7 @@
         generateCalendar();
     }
 
-    // Função para carregar os eventos e tarefas
+    // Função para carregar os eventos, tarefas e exames de saúde
     async function loadEvents() {
         try {
             // Calcular datas para o mês atual
@@ -362,13 +362,16 @@
 
             const eventsUrl = `/api/v1/calendar/events/?start_date=${formatDate(start)}&end_date=${formatDate(end)}`;
             const tasksUrl = `/api/v1/tasks/`;
+            const healthExamsUrl = `/api/v1/health/exams/`;
 
             console.log('Buscando eventos na URL:', eventsUrl);
             console.log('Buscando tarefas na URL:', tasksUrl);
+            console.log('Buscando exames de saúde na URL:', healthExamsUrl);
 
-            const [eventsResponse, tasksResponse] = await Promise.all([
+            const [eventsResponse, tasksResponse, healthExamsResponse] = await Promise.all([
                 fetch(eventsUrl),
-                fetch(tasksUrl)
+                fetch(tasksUrl),
+                fetch(healthExamsUrl)
             ]);
 
             if (!eventsResponse.ok) {
@@ -377,9 +380,13 @@
             if (!tasksResponse.ok) {
                 throw new Error(`Erro HTTP ao buscar tarefas! status: ${tasksResponse.status}`);
             }
+            if (!healthExamsResponse.ok) {
+                throw new Error(`Erro HTTP ao buscar exames de saúde! status: ${healthExamsResponse.status}`);
+            }
 
             const eventsData = await eventsResponse.json();
             const tasksData = await tasksResponse.json();
+            const healthExamsData = await healthExamsResponse.json();
 
             if (!Array.isArray(eventsData)) {
                 throw new Error('Esperava que os eventos fossem um array');
@@ -387,8 +394,11 @@
             if (!Array.isArray(tasksData)) {
                 throw new Error('Esperava que as tarefas fossem um array');
             }
+            if (!Array.isArray(healthExamsData)) {
+                throw new Error('Esperava que os exames de saúde fossem um array');
+            }
 
-            // Combina eventos e tarefas
+            // Combina eventos, tarefas e exames de saúde
             events = [
                 ...eventsData,
                 ...tasksData.map(task => ({
@@ -396,6 +406,12 @@
                     start_date: task.due_date,
                     event_type: 'task',
                     description: task.description
+                })),
+                ...healthExamsData.map(exam => ({
+                    title: exam.name,
+                    start_date: exam.date,
+                    event_type: 'health_exam',
+                    description: exam.description
                 }))
             ];
 
@@ -406,8 +422,8 @@
             showNextEvents();
             
         } catch (error) {
-            console.error('Erro ao carregar eventos e tarefas:', error);
-            showError(`Erro ao carregar eventos e tarefas: ${error.message}`);
+            console.error('Erro ao carregar eventos, tarefas e exames de saúde:', error);
+            showError(`Erro ao carregar eventos, tarefas e exames de saúde: ${error.message}`);
         }
     }
 
