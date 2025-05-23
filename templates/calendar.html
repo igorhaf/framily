@@ -110,6 +110,15 @@
         return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     }
 
+    // Função para comparar se duas datas são o mesmo dia (corrige problemas de timezone)
+    function isSameDay(date1, date2) {
+        return (
+            date1.getFullYear() === date2.getFullYear() &&
+            date1.getMonth() === date2.getMonth() &&
+            date1.getDate() === date2.getDate()
+        );
+    }
+
     // Variáveis globais para o calendário
     let currentDate = new Date();
     let events = [];
@@ -237,8 +246,8 @@
             }
             
             // Marca o dia atual e o dia selecionado
-            const isToday = date.toDateString() === new Date().toDateString();
-            const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
+            const isToday = isSameDay(date, new Date());
+            const isSelected = selectedDate === dateString;
             const todayClass = isToday ? 'ring-2 ring-blue-500' : '';
             const selectedClass = isSelected ? 'ring-2 ring-purple-500' : '';
             
@@ -340,7 +349,7 @@
 
     // Função para selecionar uma data
     function selectDate(dateString) {
-        selectedDate = new Date(dateString);
+        selectedDate = dateString;
         const dayEvents = events.filter(event => {
             if (!event.start_date && !event.due_date) return false;
             const eventDate = event.start_date ? new Date(event.start_date).toISOString().split('T')[0] : new Date(event.due_date).toISOString().split('T')[0];
@@ -352,6 +361,7 @@
         
         if (dayEvents.length === 0) {
             selectedDayEvents.innerHTML = '<div class="text-center text-gray-500">Nenhum evento para este dia</div>';
+            generateCalendar();
             return;
         }
 
