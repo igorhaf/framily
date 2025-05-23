@@ -248,8 +248,8 @@
             const monthlyBudget = data.monthly_budget || data.total_expenses || 0;
             
             document.getElementById('monthlyBudget').textContent = formatCurrency(monthlyBudget);
-            document.getElementById('monthlyIncome').textContent = formatCurrency(data.monthly_income || 0);
-            document.getElementById('monthlyBalance').textContent = formatCurrency(data.monthly_balance || 0);
+            document.getElementById('monthlyIncome').textContent = formatCurrency(data.total_income || 0);
+            document.getElementById('monthlyBalance').textContent = formatCurrency(data.balance || 0);
         } catch (error) {
             console.error('Erro ao carregar orçamento mensal:', error);
             document.getElementById('monthlyBudget').textContent = 'Erro';

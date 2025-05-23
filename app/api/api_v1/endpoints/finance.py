@@ -196,7 +196,9 @@ def get_financial_summary(
             "total_expenses": total_expenses,
             "balance": balance,
             "category_summary": category_summary,
-            "monthly_budget": total_expenses  # Orçamento mensal é igual ao total de despesas
+            "monthly_budget": total_expenses,  # Orçamento mensal é igual ao total de despesas
+            "monthly_income": total_income,    # Adicionado para o dashboard
+            "monthly_balance": balance         # Adicionado para o dashboard
         }
     except Exception as e:
         raise HTTPException(
