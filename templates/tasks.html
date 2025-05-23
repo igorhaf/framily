@@ -210,7 +210,7 @@
     // Função para atualizar o status da tarefa
     async function updateTaskStatus(taskId, newStatus) {
         try {
-            const response = await fetch(`/api/v1/tasks/${taskId}`, {
+            const response = await fetch(`/api/v1/tasks/${taskId}/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

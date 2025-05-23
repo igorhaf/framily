@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path, Body
 from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import deps
@@ -56,4 +56,21 @@ def create_task(
         raise HTTPException(
             status_code=500,
             detail="Internal server error while creating task"
-        ) 
+        )
+
+@router.patch("/{task_id}/status", response_model=schemas.Task)
+def update_task_status(
+    task_id: int = Path(..., description="ID da tarefa"),
+    status: str = Body(..., embed=True, description="Novo status da tarefa"),
+    db: Session = Depends(deps.get_db)
+):
+    """
+    Atualiza o status de uma tarefa.
+    """
+    task = crud.task.get(db, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    task.status = status
+    db.commit()
+    db.refresh(task)
+    return task 
