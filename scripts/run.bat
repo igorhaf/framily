@@ -1,5 +1,5 @@
 @echo off
-echo 🚀 Starting Family Dashboard...
+echo 🚀 Starting Framily...
 
 REM Check if Docker Desktop is running
 docker info >nul 2>&1

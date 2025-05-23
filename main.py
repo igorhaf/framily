@@ -31,7 +31,7 @@ templates = Jinja2Templates(directory="templates")
 async def home(request: Request):
     return templates.TemplateResponse(
         "index.html",
-        {"request": request, "title": "Family Dashboard"}
+        {"request": request, "title": "Framily Dashboard"}
     )
 
 @app.get("/tasks")

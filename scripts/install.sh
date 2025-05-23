@@ -3,7 +3,7 @@
 # Exit on error
 set -e
 
-echo "🚀 Setting up Family Dashboard development environment..."
+echo "🚀 Setting up Framily Dashboard development environment..."
 
 # Create necessary directories
 echo "📁 Creating necessary directories..."

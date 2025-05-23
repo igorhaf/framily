@@ -1,6 +1,6 @@
-# Documentação da API - Family Dashboard
+# Documentação da API - Framily Dashboard
 
-Esta pasta contém arquivos de coleção e ambiente do Postman para testar e explorar a API do Family Dashboard.
+Esta pasta contém arquivos de coleção e ambiente do Postman para testar e explorar a API do Framily Dashboard.
 
 ## Arquivos Incluídos
 
@@ -16,7 +16,7 @@ Esta pasta contém arquivos de coleção e ambiente do Postman para testar e exp
 
 ## Como Usar
 
-1. No canto superior direito, selecione o ambiente "Family Dashboard API - Desenvolvimento" no dropdown
+1. No canto superior direito, selecione o ambiente "Framily Dashboard API - Desenvolvimento" no dropdown
 2. A variável `baseUrl` será automaticamente configurada para `http://localhost:8000`
 3. Se sua aplicação estiver rodando em uma porta ou host diferente, você pode editar esta variável no ambiente
 

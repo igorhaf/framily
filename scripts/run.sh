@@ -12,7 +12,7 @@ cleanup() {
 # Register the cleanup function to be called on exit
 trap cleanup EXIT
 
-echo "🚀 Starting Family Dashboard..."
+echo "🚀 Starting Framily Dashboard..."
 
 # Check if PostgreSQL container is running
 if ! docker-compose ps postgres | grep -q "Up"; then

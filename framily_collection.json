@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "c5c72e9d-4d6b-4a3c-a8c9-0f7f3b2e1d4f",
-    "name": "Family Dashboard API",
-    "description": "API para o sistema de gerenciamento familiar (Family Dashboard)",
+    "name": "Framily Dashboard API",
+    "description": "API para o sistema de gerenciamento familiar (Framily Dashboard)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [

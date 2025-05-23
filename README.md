@@ -1,4 +1,4 @@
-# Family Dashboard
+# Framily Dashboard
 
 A modern, intelligent dashboard for family planning and organization. Built with FastAPI, Jinja2, and PostgreSQL.
 
@@ -120,7 +120,7 @@ SECRET_KEY=your-secret-key-here
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
 # Application
-PROJECT_NAME=Family Dashboard
+PROJECT_NAME=Framily Dashboard
 ```
 
 ### Docker Services

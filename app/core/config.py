@@ -4,7 +4,7 @@ from pydantic import AnyHttpUrl
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Family Dashboard"
+    PROJECT_NAME: str = "Framily Dashboard"
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = "your-secret-key-here"
     ALGORITHM: str = "HS256"
