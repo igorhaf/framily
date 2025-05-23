@@ -150,13 +150,40 @@
                 const eventDate = event.start_date ? new Date(event.start_date).toISOString().split('T')[0] : new Date(event.due_date).toISOString().split('T')[0];
                 return eventDate === dateString;
             });
-            
+
+            // Contar eventos por tipo
+            const typeCounts = {
+                event: 0,
+                important: 0,
+                recurring: 0,
+                task: 0,
+                health_exam: 0,
+                health_appointment: 0
+            };
+            dayEvents.forEach(event => {
+                if (event.event_type === 'important') typeCounts.important++;
+                else if (event.event_type === 'recurring') typeCounts.recurring++;
+                else if (event.event_type === 'task') typeCounts.task++;
+                else if (event.event_type === 'health_exam') typeCounts.health_exam++;
+                else if (event.event_type === 'health_appointment') typeCounts.health_appointment++;
+                else typeCounts.event++;
+            });
+
+            // Montar os ícones com contagem
+            const icons = [];
+            if (typeCounts.event > 0) icons.push(`<span title='Eventos' class='inline-flex items-center mr-1'>📅 <span class='ml-0.5 text-xs font-semibold text-blue-800'>${typeCounts.event}</span></span>`);
+            if (typeCounts.important > 0) icons.push(`<span title='Importantes' class='inline-flex items-center mr-1'>❗ <span class='ml-0.5 text-xs font-semibold text-red-800'>${typeCounts.important}</span></span>`);
+            if (typeCounts.recurring > 0) icons.push(`<span title='Recorrentes' class='inline-flex items-center mr-1'>🔁 <span class='ml-0.5 text-xs font-semibold text-green-800'>${typeCounts.recurring}</span></span>`);
+            if (typeCounts.task > 0) icons.push(`<span title='Tarefas' class='inline-flex items-center mr-1'>✅ <span class='ml-0.5 text-xs font-semibold text-purple-800'>${typeCounts.task}</span></span>`);
+            if (typeCounts.health_exam > 0) icons.push(`<span title='Exames' class='inline-flex items-center mr-1'>🩺 <span class='ml-0.5 text-xs font-semibold text-pink-800'>${typeCounts.health_exam}</span></span>`);
+            if (typeCounts.health_appointment > 0) icons.push(`<span title='Consultas' class='inline-flex items-center mr-1'>🏥 <span class='ml-0.5 text-xs font-semibold text-cyan-800'>${typeCounts.health_appointment}</span></span>`);
+
             // Determina a cor de fundo baseada no tipo de evento
             let bgColor = 'bg-white';
             if (dayEvents.length > 0) {
-                if (dayEvents.some(event => event.event_type === 'recurring')) {
+                if (typeCounts.recurring > 0) {
                     bgColor = 'bg-green-50';
-                } else if (dayEvents.some(event => event.event_type === 'important')) {
+                } else if (typeCounts.important > 0) {
                     bgColor = 'bg-red-50';
                 } else {
                     bgColor = 'bg-blue-50';
@@ -173,17 +200,7 @@
                 <div class="h-24 p-2 ${bgColor} ${todayClass} ${selectedClass} rounded-lg relative cursor-pointer hover:bg-gray-50"
                      onclick="selectDate('${dateString}')">
                     <span class="text-sm font-medium">${day}</span>
-                    ${dayEvents.length > 0 ? `
-                        <div class="mt-1">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                                dayEvents.some(event => event.event_type === 'recurring') ? 'bg-green-100 text-green-800' :
-                                dayEvents.some(event => event.event_type === 'important') ? 'bg-red-100 text-red-800' :
-                                'bg-blue-100 text-blue-800'
-                            }">
-                                ${dayEvents.length} evento${dayEvents.length > 1 ? 's' : ''}
-                            </span>
-                        </div>
-                    ` : ''}
+                    ${icons.length > 0 ? `<div class="mt-1 flex flex-wrap">${icons.join('')}</div>` : ''}
                 </div>
             `);
         }
