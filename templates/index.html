@@ -58,6 +58,22 @@
                                 Carregando...
                             </div>
                         </dd>
+                        <dd class="mt-3">
+                            <ul class="text-sm text-gray-700 space-y-1">
+                                <li>
+                                    <span class="text-sm text-gray-700 space-y-1">Em andamento:</span>
+                                    <span id="inProgressTasksCount" class="text-sm text-gray-700 space-y-1">-</span>
+                                </li>
+                                <li>
+                                    <span class="text-sm text-gray-700 space-y-1">Concluídas:</span>
+                                    <span id="completedTasksCount" class="text-sm text-gray-700 space-y-1">-</span>
+                                </li>
+                                <li>
+                                    <span class="text-sm text-gray-700 space-y-1">Total:</span>
+                                    <span id="totalTasksCount" class="text-sm text-gray-700 space-y-1">-</span>
+                                </li>
+                            </ul>
+                        </dd>
                     </dl>
                 </div>
             </div>
@@ -137,10 +153,16 @@
             }
             const tasks = await response.json();
             
-            // Atualiza o contador de tarefas pendentes
-            const pendingTasks = tasks.filter(task => task.status !== 'completed');
+            // Atualiza os contadores
+            const pendingTasks = tasks.filter(task => task.status === 'pending');
+            const inProgressTasks = tasks.filter(task => task.status === 'in_progress');
+            const completedTasks = tasks.filter(task => task.status === 'completed');
+
             document.getElementById('pendingTasksCount').textContent = pendingTasks.length;
-            
+            document.getElementById('inProgressTasksCount').textContent = inProgressTasks.length;
+            document.getElementById('completedTasksCount').textContent = completedTasks.length;
+            document.getElementById('totalTasksCount').textContent = tasks.length;
+
             // Atualiza a lista de atividades recentes
             const recentActivityList = document.getElementById('recentActivity');
             if (tasks.length === 0) {
