@@ -66,6 +66,31 @@
         </div>
     </div>
 </div>
+
+<!-- Botão Flutuante de Criar Evento -->
+<div class="fixed bottom-8 right-8 z-50">
+    <div class="group relative">
+        <!-- Círculo de fundo com efeito de hover -->
+        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+        <!-- Botão principal -->
+        <a href="/calendar/events/new">
+            <button class="relative flex items-center justify-center w-14 h-14 bg-blue-600 hover:bg-blue-700 rounded-full shadow-lg transition-all duration-300 transform group-hover:rotate-45 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <!-- Ícone de + (visível por padrão) -->
+                <svg class="w-8 h-8 text-white transition-opacity duration-300 group-hover:opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <!-- Ícone de calendário (visível no hover, compensando rotação) -->
+                <svg class="w-8 h-8 text-white absolute transition-opacity duration-300 opacity-0 group-hover:opacity-100 group-hover:-rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            </button>
+        </a>
+        <!-- Tooltip -->
+        <div class="absolute right-16 top-1/2 -translate-y-1/2 bg-gray-900 text-white px-3 py-1 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+            Criar novo evento
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
