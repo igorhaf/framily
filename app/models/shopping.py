@@ -17,8 +17,7 @@ class StatusEnum(str, enum.Enum):
 
 class CategoryEnum(str, enum.Enum):
     FOOD = "FOOD"
-    CLEANING = "CLEANING"
-    HYGIENE = "HYGIENE"
+    PERSONAL = "PERSONAL"
     HOUSEHOLD = "HOUSEHOLD"
     OTHER = "OTHER"
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from app.api import deps
 from app.crud import shopping_list
@@ -53,34 +53,38 @@ async def health_page(request: Request):
 
 @pages_router.get("/shopping")
 async def shopping_page(request: Request):
-    db = next(deps.get_db())
-    shopping_lists_db = shopping_list.get_multi(db)
-    shopping_lists = [ShoppingListInDB.model_validate(lst) for lst in shopping_lists_db]
+    try:
+        db = next(deps.get_db())
+        shopping_lists_db = shopping_list.get_multi(db)
+        shopping_lists = [ShoppingListInDB.model_validate(lst) for lst in shopping_lists_db]
 
-    # Contadores para os cards
-    total_items = 0
-    pending_items = 0
-    bought_items = 0
+        # Contadores para os cards
+        total_items = 0
+        pending_items = 0
+        bought_items = 0
 
-    for lst in shopping_lists:
-        for item in lst.items:
-            total_items += 1
-            if item.status.value == "PENDING":
-                pending_items += 1
-            elif item.status.value == "BOUGHT":
-                bought_items += 1
+        for lst in shopping_lists:
+            for item in lst.items:
+                total_items += 1
+                if item.status.value == "PENDING":
+                    pending_items += 1
+                elif item.status.value == "BOUGHT":
+                    bought_items += 1
 
-    return templates.TemplateResponse(
-        "shopping.html",
-        {
-            "request": request,
-            "title": "Shopping",
-            "shopping_lists": shopping_lists,
-            "total_items": total_items,
-            "pending_items": pending_items,
-            "bought_items": bought_items,
-        }
-    )
+        return templates.TemplateResponse(
+            "shopping.html",
+            {
+                "request": request,
+                "title": "Shopping",
+                "shopping_lists": shopping_lists,
+                "total_items": total_items,
+                "pending_items": pending_items,
+                "bought_items": bought_items,
+            }
+        )
+    except Exception as e:
+        print(f"Erro na página de shopping: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @pages_router.get("/shopping_debug", response_class=HTMLResponse)
 async def shopping_debug(request: Request, db: Session = Depends(deps.get_db)):
