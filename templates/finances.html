@@ -18,7 +18,7 @@
     <div id="dashboard-content" class="hidden">
         <!-- Estatísticas Rápidas -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <!-- Receitas -->
+        <!-- Receitas -->
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-green-100 text-green-500">
@@ -29,11 +29,11 @@
                     <div class="ml-4">
                         <h3 class="text-sm font-medium text-gray-500">Receitas do Mês</h3>
                         <p id="totalIncome" class="text-2xl font-semibold text-gray-900">Carregando...</p>
-                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Despesas -->
+        <!-- Despesas -->
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-red-100 text-red-500">
@@ -44,11 +44,11 @@
                     <div class="ml-4">
                         <h3 class="text-sm font-medium text-gray-500">Despesas do Mês</h3>
                         <p id="totalExpenses" class="text-2xl font-semibold text-gray-900">Carregando...</p>
-                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Saldo -->
+        <!-- Saldo -->
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-blue-100 text-blue-500">
@@ -74,9 +74,9 @@
                 <div class="p-6">
                     <div id="categoryBudget" class="space-y-4">
                         <div class="text-center text-gray-500">Carregando categorias...</div>
-                    </div>
-                </div>
             </div>
+        </div>
+    </div>
 
             <!-- Últimas Transações -->
             <div class="bg-white rounded-lg shadow">
@@ -86,12 +86,12 @@
                 <div class="p-6">
                     <div id="recentTransactions" class="space-y-4">
                         <div class="text-center text-gray-500">Carregando transações...</div>
-                    </div>
+        </div>
+                </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 <!-- Menu Flutuante de Financeiro -->
 <div class="fixed bottom-8 right-8 z-50">
@@ -388,14 +388,14 @@
             if (!Array.isArray(transactions)) {
                 throw new Error('Esperava que as transações fossem um array');
             }
-
+            
             const recentTransactions = document.getElementById('recentTransactions');
             
             if (transactions.length === 0) {
                 recentTransactions.innerHTML = '<div class="text-center text-gray-500">Nenhuma transação encontrada</div>';
                 return;
             }
-
+            
             recentTransactions.innerHTML = transactions.map(transaction => `
                 <div class="bg-white rounded-lg p-4 border ${
                     transaction.type === 'income' ? 'border-green-200' : 'border-red-200'
